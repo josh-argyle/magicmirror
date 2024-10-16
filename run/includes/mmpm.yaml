@@ -1,7 +1,7 @@
 services:
   mmpm:
     container_name: mmpm
-    image: karsten13/mmpm:latest
+    image: ${MMPM_IMAGE}
     depends_on:
       magicmirror:
         condition: service_started

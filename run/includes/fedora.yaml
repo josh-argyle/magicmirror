@@ -1,6 +1,6 @@
 services:
   fedora:
-    image: karsten13/magicmirror:fedora
+    image: ${FEDORA_IMAGE}
     volumes:
       - ${VOLUME_CONFIG}:z
       - ${VOLUME_MODULES}:z

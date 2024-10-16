@@ -9,7 +9,7 @@ services:
       service: fedora
   xserver:
     container_name: xserver
-    image: karsten13/xserver:latest
+    image: ${XSERVER_IMAGE}
     volumes:
       - /run/udev/data:/run/udev/data:z
     restart: unless-stopped

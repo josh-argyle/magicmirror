@@ -1,7 +1,7 @@
 services:
   xserver:
     container_name: xserver
-    image: karsten13/xserver:latest
+    image: ${XSERVER_IMAGE}
     privileged: true
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
