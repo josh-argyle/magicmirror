@@ -1,7 +1,7 @@
 # start with: dc run --rm --name mm --service-ports magicmirror
 services:
   magicmirror:
-    image: registry.gitlab.com/khassel/magicmirror:develop_debug22
+    image: registry.gitlab.com/khassel/magicmirror:develop_debug23
 #    volumes:
 #      - /tmp/.X11-unix:/tmp/.X11-unix
 #      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket

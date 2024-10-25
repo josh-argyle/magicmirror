@@ -101,10 +101,10 @@ build_debug22:
   extends:
   - .build_debug
 
-build_debug20:
+build_debug23:
   variables:
-    ADD_TAG: "debug20"
-    NODE_VERSION: "20"
+    ADD_TAG: "debug23"
+    NODE_VERSION: "23"
   extends:
   - .build_debug
 
