@@ -138,6 +138,7 @@ if [ "$STARTENV" = "test" ]; then
   npm run test:prettier
   npm run test:js
   npm run test:css
+  npm run test:markdown
   npm run test:unit
   npm run test:e2e
   npm run test:electron
