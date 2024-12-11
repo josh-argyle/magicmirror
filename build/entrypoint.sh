@@ -25,6 +25,7 @@ _start_mm() {
     _info "running as root but starting the magicmirror process with uid=1000"
     # directories must be writable by user node:
     chown -R node:node ${mounted}
+    chown node:node ${modules_dir}
     _file="mm.env"
     rm -f $_file
     echo "export START_CMD=\"$@\"" > $_file
