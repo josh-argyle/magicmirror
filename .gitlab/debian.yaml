@@ -1,30 +1,30 @@
 .runtimebuild:
   stage: build
   script:
-  - |
-    set -e
-    [ -z "${SLIM}" ] && export FAT="_fat"
-    [ "${dev}" == "dn" ] && export NODE_ENV="production" || export NODE_ENV="test"
-    set | grep -E "BUILDER_IMG=|NODE_VERSION=|buildarch=|FAT=|DEBIAN_VERSION=|ADD_TAG="
-    build --context "./build" \
-      --dockerfile "Dockerfile-debian" \
-      --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}${FAT}_${ADD_TAG}" \
-      --build-arg NODE_VERSION="${NODE_VERSION}" \
-      --build-arg DEBIAN_VERSION="${DEBIAN_VERSION}" \
-      --build-arg GIT_INFO="${GIT_INFO}" \
-      --build-arg buildarch="${buildarch}" \
-      --build-arg BUILDER_IMG="${BUILDER_IMG}" \
-      --build-arg SLIM="${SLIM}" \
-      --build-arg opt="${opt}" \
-      --build-arg CONTAINER_PCK_REG_TOKEN="${CONTAINER_PCK_REG_TOKEN}" \
-      --build-arg NODE_ENV="${NODE_ENV}"
-  extends: 
-  - .beforescript
+    - |
+      set -e
+      [ -z "${SLIM}" ] && export FAT="_fat"
+      [ "${dev}" == "dn" ] && export NODE_ENV="production" || export NODE_ENV="test"
+      set | grep -E "BUILDER_IMG=|NODE_VERSION=|buildarch=|FAT=|DEBIAN_VERSION=|ADD_TAG="
+      build --context "./build" \
+        --dockerfile "Dockerfile-debian" \
+        --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}${FAT}_${ADD_TAG}" \
+        --build-arg NODE_VERSION="${NODE_VERSION}" \
+        --build-arg DEBIAN_VERSION="${DEBIAN_VERSION}" \
+        --build-arg GIT_INFO="${GIT_INFO}" \
+        --build-arg buildarch="${buildarch}" \
+        --build-arg BUILDER_IMG="${BUILDER_IMG}" \
+        --build-arg SLIM="${SLIM}" \
+        --build-arg opt="${opt}" \
+        --build-arg CONTAINER_PCK_REG_TOKEN="${CONTAINER_PCK_REG_TOKEN}" \
+        --build-arg NODE_ENV="${NODE_ENV}"
+  extends:
+    - .beforescript
 
 .runtime:
   extends:
-  - .runtimebuild
-  - .rule
+    - .runtimebuild
+    - .rule
 
 build_amd64:
   variables:
@@ -32,7 +32,8 @@ build_amd64:
     SLIM: "-slim"
     ADD_TAG: "amd64"
   needs: ["bld_art: [amd64-on-dn]"]
-  extends: .runtime
+  extends:
+    - .runtime
   environment:
     name: "$CI_COMMIT_BRANCH/Build amd64"
 
@@ -41,7 +42,8 @@ build_amd64_fat:
     imgkey: "amd64-oy-dn"
     ADD_TAG: "amd64"
   needs: ["bld_art: [amd64-oy-dn]"]
-  extends: .runtime
+  extends:
+    - .runtime
   environment:
     name: "$CI_COMMIT_BRANCH/Build amd64 fat"
 
@@ -51,7 +53,8 @@ build_arm:
     SLIM: "-slim"
     ADD_TAG: "arm"
   needs: ["bld_art: [arm-oy-dn]"]
-  extends: .runtime
+  extends:
+    - .runtime
   environment:
     name: "$CI_COMMIT_BRANCH/Build arm"
 
@@ -60,7 +63,8 @@ build_arm_fat:
     imgkey: "arm-oy-dn"
     ADD_TAG: "arm"
   needs: ["bld_art: [arm-oy-dn]"]
-  extends: .runtime
+  extends:
+    - .runtime
   environment:
     name: "$CI_COMMIT_BRANCH/Build arm fat"
 
@@ -70,7 +74,8 @@ build_arm64:
     SLIM: "-slim"
     ADD_TAG: "arm64"
   needs: ["bld_art: [arm64-oy-dn]"]
-  extends: .runtime
+  extends:
+    - .runtime
   environment:
     name: "$CI_COMMIT_BRANCH/Build arm64"
 
@@ -79,7 +84,8 @@ build_arm64_fat:
     imgkey: "arm64-oy-dn"
     ADD_TAG: "arm64"
   needs: ["bld_art: [arm64-oy-dn]"]
-  extends: .runtime
+  extends:
+    - .runtime
   environment:
     name: "$CI_COMMIT_BRANCH/Build arm64 fat"
 
@@ -89,8 +95,8 @@ build_arm64_fat:
     imgkey: "amd64-oy-dy"
   needs: ["bld_art: [amd64-oy-dy]"]
   extends:
-  - .runtimebuild
-  - .rulenomaster
+    - .runtimebuild
+    - .rulenomaster
   environment:
     name: "$CI_COMMIT_BRANCH/Build Debug"
 
@@ -99,39 +105,39 @@ build_debug22:
     ADD_TAG: "debug22"
     NODE_VERSION: "22"
   extends:
-  - .build_debug
+    - .build_debug
 
 build_debug23:
   variables:
     ADD_TAG: "debug23"
     NODE_VERSION: "23"
   extends:
-  - .build_debug
+    - .build_debug
 
 sync_slim:
   image: ${TOOLBOX_IMG}
   needs:
-  - build_amd64
-  - build_arm64
-  - build_arm
+    - build_amd64
+    - build_arm64
+    - build_arm
   stage: build
   script:
-  - |
-    set -e
-    set | grep -E "CI_COMMIT_BRANCH=|CI_REGISTRY_IMAGE=|MAGICMIRROR_VERSION="
-    docker.gitlab.login
-    if [ "${CI_COMMIT_BRANCH}" = "master" ]; then
-      docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}" "latest"
-      docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}" "${MAGICMIRROR_VERSION}"
-      docker.sync "${CI_REGISTRY_IMAGE}:latest ${CI_REGISTRY_IMAGE}:${MAGICMIRROR_VERSION}"
-    else
-      docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}" "${CI_COMMIT_BRANCH}"
-      docker.sync "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}"
-    fi
+    - |
+      set -e
+      set | grep -E "CI_COMMIT_BRANCH=|CI_REGISTRY_IMAGE=|MAGICMIRROR_VERSION="
+      docker.gitlab.login
+      if [ "${CI_COMMIT_BRANCH}" = "master" ]; then
+        docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}" "latest"
+        docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}" "${MAGICMIRROR_VERSION}"
+        docker.sync "${CI_REGISTRY_IMAGE}:latest ${CI_REGISTRY_IMAGE}:${MAGICMIRROR_VERSION}"
+      else
+        docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}" "${CI_COMMIT_BRANCH}"
+        docker.sync "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}"
+      fi
   after_script:
     - docker.logout
-  extends: 
-  - .rule
+  extends:
+    - .rule
   environment:
     name: "$CI_COMMIT_BRANCH/Docker Sync Debian"
     url: https://hub.docker.com/r/karsten13/magicmirror/tags
@@ -139,27 +145,27 @@ sync_slim:
 sync_fat:
   image: ${TOOLBOX_IMG}
   needs:
-  - build_amd64_fat
-  - build_arm64_fat
-  - build_arm_fat
+    - build_amd64_fat
+    - build_arm64_fat
+    - build_arm_fat
   stage: build
   script:
-  - |
-    set -e
-    set | grep -E "CI_COMMIT_BRANCH=|CI_REGISTRY_IMAGE=|MAGICMIRROR_VERSION="
-    docker.gitlab.login
-    if [ "${CI_COMMIT_BRANCH}" = "master" ]; then
-      docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_fat" "fat"
-      docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_fat" "${MAGICMIRROR_VERSION}_fat"
-      docker.sync "${CI_REGISTRY_IMAGE}:fat ${CI_REGISTRY_IMAGE}:${MAGICMIRROR_VERSION}_fat"
-    else
-      docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_fat" "${CI_COMMIT_BRANCH}_fat"
-      docker.sync "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_fat"
-    fi
+    - |
+      set -e
+      set | grep -E "CI_COMMIT_BRANCH=|CI_REGISTRY_IMAGE=|MAGICMIRROR_VERSION="
+      docker.gitlab.login
+      if [ "${CI_COMMIT_BRANCH}" = "master" ]; then
+        docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_fat" "fat"
+        docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_fat" "${MAGICMIRROR_VERSION}_fat"
+        docker.sync "${CI_REGISTRY_IMAGE}:fat ${CI_REGISTRY_IMAGE}:${MAGICMIRROR_VERSION}_fat"
+      else
+        docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_fat" "${CI_COMMIT_BRANCH}_fat"
+        docker.sync "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_fat"
+      fi
   after_script:
     - docker.logout
-  extends: 
-  - .rule
+  extends:
+    - .rule
   environment:
     name: "$CI_COMMIT_BRANCH/Docker Sync Debian Fat"
     url: https://hub.docker.com/r/karsten13/magicmirror/tags

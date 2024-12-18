@@ -4,65 +4,67 @@
     GIT_STRATEGY: none
     STARTENV: test
   script:
-  - /opt/magic_mirror/entrypoint.sh
+    - /opt/magic_mirror/entrypoint.sh
   extends:
-  - .rulenomaster
+    - .rulenomaster
   environment:
     name: "$CI_COMMIT_BRANCH/Test MagicMirror"
 
 test_debug23:
   needs: ["build_debug23"]
-  image: 
+  image:
     name: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_debug23
     entrypoint: [""]
-  extends: .test_debug
+  extends:
+    - .test_debug
 
 test_debug22:
   needs: ["build_debug22"]
-  image: 
+  image:
     name: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_debug22
     entrypoint: [""]
-  extends: .test_debug
+  extends:
+    - .test_debug
 
 test_electron_rebuild:
   stage: test
   variables:
     GIT_STRATEGY: none
-  image: 
+  image:
     name: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_fat_amd64
     entrypoint: [""]
   script:
-  - |
-    cd /opt/magic_mirror
-    echo "electron version:"
-    npx electron -v
-    echo "install additional dependencies:"
-    npm install @electron/rebuild onoff node-pty drivelist
-    echo "electron-rebuild version:"
-    npx electron-rebuild --version
-    echo "run electron-rebuild:"
-    npx electron-rebuild
+    - |
+      cd /opt/magic_mirror
+      echo "electron version:"
+      npx electron -v
+      echo "install additional dependencies:"
+      npm install @electron/rebuild onoff node-pty drivelist
+      echo "electron-rebuild version:"
+      npx electron-rebuild --version
+      echo "run electron-rebuild:"
+      npx electron-rebuild
   rules:
-  - if: $TASK == "electronrebuild"
-  - if: $TASK == "runtime" && $CI_COMMIT_BRANCH != "master"
-    needs: ["build_amd64_fat"]
+    - if: $TASK == "electronrebuild"
+    - if: $TASK == "runtime" && $CI_COMMIT_BRANCH != "master"
+      needs: ["build_amd64_fat"]
   environment:
     name: "$CI_COMMIT_BRANCH/Test Electron rebuild"
 
 snyk_amd64:
   stage: test
-  image: 
+  image:
     name: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_debug22
     entrypoint: [""]
   script:
-  - cd /opt/magic_mirror
-  - npm install snyk npm-check-updates
-  - npx ncu --deep
-  - npx ncu --deep --target minor
-  - npx snyk auth ${SNYK_TOKEN}
-  - npx snyk test --all-projects
+    - cd /opt/magic_mirror
+    - npm install snyk npm-check-updates
+    - npx ncu --deep
+    - npx ncu --deep --target minor
+    - npx snyk auth ${SNYK_TOKEN}
+    - npx snyk test --all-projects
   rules:
-  - if: $TASK == "snyk"
+    - if: $TASK == "snyk"
   environment:
     name: "$CI_COMMIT_BRANCH/Snyk Security Scan"
 
@@ -75,7 +77,7 @@ container_scanning:
     DOCKERFILE_PATH: build/Dockerfile-debian
     GIT_STRATEGY: fetch
   rules:
-  - if: $TASK == "containerscan"
+    - if: $TASK == "containerscan"
   environment:
     name: "$CI_COMMIT_BRANCH/Gitlab Security Scan"
 
@@ -90,7 +92,7 @@ triage:
     - gem install gitlab-triage
     - gitlab-triage --token $TRIAGE_API_TOKEN --source projects --source-id $CI_PROJECT_PATH
   rules:
-  - if: $TASK == "triage"
+    - if: $TASK == "triage"
   environment:
     name: "$CI_COMMIT_BRANCH/Triage"
 
@@ -101,16 +103,16 @@ test_manual_build:
     NODE_VERSION: $NODE_VERSION_DEVELOP
     BuildRef: "develop"
   script:
-  - |
-    build --context "./build" \
-    --dockerfile "Dockerfile-test" \
-    --destination "${CI_REGISTRY_IMAGE}:test" \
-    --build-arg DEBIAN_VERSION="${DEBIAN_VERSION}" \
-    --build-arg NODE_VERSION="${NODE_VERSION}" \
-    --build-arg BuildRef="${BuildRef}" \
-    --build-arg GitRepo="${GitRepo}"
+    - |
+      build --context "./build" \
+      --dockerfile "Dockerfile-test" \
+      --destination "${CI_REGISTRY_IMAGE}:test" \
+      --build-arg DEBIAN_VERSION="${DEBIAN_VERSION}" \
+      --build-arg NODE_VERSION="${NODE_VERSION}" \
+      --build-arg BuildRef="${BuildRef}" \
+      --build-arg GitRepo="${GitRepo}"
   rules:
-  - if: $TASK == "manual"
+    - if: $TASK == "manual"
 
 test_manual_run:
   stage: test
@@ -118,19 +120,19 @@ test_manual_run:
   variables:
     GIT_STRATEGY: none
   needs:
-  - test_manual_build
+    - test_manual_build
   script:
-  - |
-    echo "start tests ..."
-    export DISPLAY=:99
-    Xvfb :99 -screen 0 1024x768x16 &
-    cd /home/node/mm
-    npm run test:prettier
-    npm run test:js
-    npm run test:css
-    npm run test:markdown
-    npm run test:unit
-    npm run test:e2e
-    npm run test:electron
+    - |
+      echo "start tests ..."
+      export DISPLAY=:99
+      Xvfb :99 -screen 0 1024x768x16 &
+      cd /home/node/mm
+      npm run test:prettier
+      npm run test:js
+      npm run test:css
+      npm run test:markdown
+      npm run test:unit
+      npm run test:e2e
+      npm run test:electron
   rules:
-  - if: $TASK == "manual"
+    - if: $TASK == "manual"

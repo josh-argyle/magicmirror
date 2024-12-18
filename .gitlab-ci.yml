@@ -8,7 +8,10 @@ include:
     file: "/.yaml/docker_readme.yaml"
   - ".gitlab/*.yaml"
 
-image: ${CI_REGISTRY}/khassel/container/kaniko:latest
+default:
+  tags:
+    - saas-linux-medium-amd64
+  image: ${CI_REGISTRY}/khassel/container/kaniko:latest
 
 variables:
   GIT_DEPTH: 1
@@ -22,11 +25,11 @@ variables:
 
 .rule:
   rules:
-  - if: $TASK == "runtime"
+    - if: $TASK == "runtime"
 
 .rulenomaster:
   rules:
-  - if: $TASK == "runtime" && $CI_COMMIT_BRANCH != "master"
+    - if: $TASK == "runtime" && $CI_COMMIT_BRANCH != "master"
 
 .beforescript:
   before_script:
@@ -79,8 +82,8 @@ pages:
     paths:
       - public
   rules:
-  - if: $TASK == "pages"
-  - if: $CI_COMMIT_BRANCH == "master" && $TASK == "runtime"
+    - if: $TASK == "pages"
+    - if: $CI_COMMIT_BRANCH == "master" && $TASK == "runtime"
   environment:
     name: "$CI_COMMIT_BRANCH/Documentation"
     url: https://khassel.gitlab.io/magicmirror/
@@ -89,12 +92,12 @@ sync_readme:
   stage: build
   extends: .docker_readme
   rules:
-  - if: $TASK == "readme"
-  - if: $CI_COMMIT_BRANCH == "master" && $TASK == "runtime"
-    needs:
-    - sync_slim
-    - sync_fat
-    - sync_alpine
+    - if: $TASK == "readme"
+    - if: $CI_COMMIT_BRANCH == "master" && $TASK == "runtime"
+      needs:
+        - sync_slim
+        - sync_fat
+        - sync_alpine
   environment:
     name: "$CI_COMMIT_BRANCH/Docker Readme"
     url: https://hub.docker.com/r/karsten13/magicmirror
