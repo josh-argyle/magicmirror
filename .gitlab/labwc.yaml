@@ -2,23 +2,23 @@ include:
   - project: "khassel/buildkit"
     file: "/.buildkit.yml"
 
-build_xserver:
+build_labwc:
   stage: build
   extends:
     - .docker_buildkit
   variables:
-    DOCKER_CONTEXT: "./build/xserver"
-    DOCKERFILE_DIR: "./build/xserver"
+    DOCKER_CONTEXT: "./build/labwc"
+    DOCKERFILE_DIR: "./build/labwc"
     GIT_DEPTH: 1
     REGISTRY: "docker"
     BUILDKIT_ARGS: "--opt platform=linux/amd64,linux/arm64,linux/arm/v7"
   script:
     - |
       if [ "${CI_COMMIT_BRANCH}" = "master" ]; then
-        export PUSH_IMAGES="karsten13/xserver:latest"
+        export PUSH_IMAGES="karsten13/labwc:latest"
       else
-        export PUSH_IMAGES="karsten13/xserver:${CI_COMMIT_BRANCH}"
+        export PUSH_IMAGES="karsten13/labwc:${CI_COMMIT_BRANCH}"
       fi
     - !reference [.docker_buildkit, script]
   rules:
-    - if: $TASK == "build_xserver"
+    - if: $TASK == "build_labwc"

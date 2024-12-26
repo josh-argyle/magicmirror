@@ -1,0 +1,12 @@
+services:
+  labwc:
+    container_name: labwc
+    restart: unless-stopped
+    image: ${LABWC_IMAGE}
+    environment:
+      - XDG_RUNTIME_DIR=${LAB_WC_SOCK_DIR}
+      - RANDR_PARAMS
+      - RANDR_DELAY
+    volumes:
+      - $LAB_WC_SOCK_DIR:$LAB_WC_SOCK_DIR
+    privileged: true

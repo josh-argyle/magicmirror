@@ -64,6 +64,7 @@ if [[ ! -f ".env" ]]; then
   if [[ "$branch" != "master" ]]; then
     echo "we are not on the master branch so using image karsten13/magicmirror:develop"
     sed -i 's|MM_IMAGE=.*|MM_IMAGE="karsten13/magicmirror:develop"|g' .env
+    sed -i 's|LABWC_IMAGE=.*|LABWC_IMAGE="karsten13/labwc:develop"|g' .env
   fi
 
   # set scenario:
@@ -74,12 +75,12 @@ if [[ ! -f ".env" ]]; then
     sed -i 's|MM_INIT=.*|MM_INIT="init"|g' .env
   fi
 
-  sed -i 's|MM_XSERVER=.*|MM_XSERVER="no"|g' .env
+  sed -i 's|MM_LABWC=.*|MM_LABWC="no"|g' .env
   if [[ "$scenario" == "electron" ]]; then
-    if ! xset -q > /dev/null 2>&1; then
-      # use own xserver
-      echo "found no xserver so using own container"
-      sed -i 's|MM_XSERVER=.*|MM_XSERVER="xserver"|g' .env
+    if ! xset -q > /dev/null 2>&1 && ! command -v labwc > /dev/null 2>&1; then
+      # use own labwc
+      echo "found no xserver or wayland so using own container"
+      sed -i 's|MM_LABWC=.*|MM_LABWC="labwc"|g' .env
     fi
   fi
 fi

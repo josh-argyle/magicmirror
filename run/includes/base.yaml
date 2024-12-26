@@ -33,18 +33,28 @@ services:
     extends:
       service: base
     volumes:
+      # removes error messages, not needed for running:
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
+      # xserver:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - $HOME/.Xauthority:/home/node/.Xauthority
-      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
-    privileged: true # avoids dbus errors in logs
+      # labwc
+      - $LAB_WC_SOCK_DIR:$LAB_WC_SOCK_DIR
+    privileged: true
     devices:
       - /dev/vchiq
     environment:
-      DISPLAY: unix:0.0
-      MM_OVERRIDE_DEFAULT_MODULES: ${MM_OVERRIDE_DEFAULT_MODULES}
-      MM_OVERRIDE_CSS: ${MM_OVERRIDE_CSS}
-      MM_SHOW_CURSOR: ${MM_SHOW_CURSOR}
-      MM_SCENARIO: ${MM_SCENARIO}
+      - MM_OVERRIDE_DEFAULT_MODULES
+      - MM_OVERRIDE_CSS
+      - MM_SHOW_CURSOR
+      - MM_SCENARIO
+      - MM_MODULES_DIR
+      - MM_CUSTOMCSS_FILE
+      # xserver:
+      - DISPLAY=unix:0.0
+      # labwc
+      - WAYLAND_DISPLAY=wayland-0
+      - XDG_RUNTIME_DIR=${LAB_WC_SOCK_DIR}
     network_mode: host
     shm_size: "128mb"
   electron_init:
@@ -56,10 +66,19 @@ services:
   client_no:
     image: ${MM_IMAGE}
     volumes:
+      # removes error messages, not needed for running:
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
+      # xserver:
       - /tmp/.X11-unix:/tmp/.X11-unix
-      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
-    privileged: true # avoids dbus errors in logs
+      - $HOME/.Xauthority:/home/node/.Xauthority
+      # labwc
+      - $LAB_WC_SOCK_DIR:$LAB_WC_SOCK_DIR
+    privileged: true
     environment:
-      DISPLAY: unix:0.0
+      # xserver:
+      - DISPLAY=unix:0.0
+      # labwc
+      - WAYLAND_DISPLAY=wayland-0
+      - XDG_RUNTIME_DIR=${LAB_WC_SOCK_DIR}
     shm_size: "128mb"
     command: "node clientonly --address ${MM_CLIENT_ADDRESS} --port ${MM_CLIENT_PORT}"

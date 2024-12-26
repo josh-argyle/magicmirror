@@ -77,7 +77,7 @@ Here an example, `compose.yaml`:
 include:
   - includes/${MM_INIT}.yaml
   - includes/${MM_MMPM}.yaml
-  - includes/${MM_XSERVER}.yaml
+  - includes/${MM_LABWC}.yaml
   - includes/${MM_WATCHTOWER}.yaml
 
 services:
