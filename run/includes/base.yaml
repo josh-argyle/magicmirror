@@ -5,13 +5,7 @@ services:
       - ${VOLUME_CONFIG}
       - ${VOLUME_MODULES}
       - ${VOLUME_CSS}
-  base_init:
-    depends_on:
-      init:
-        condition: service_completed_successfully
-    extends:
-      service: base
-  server_no:
+  base_env:
     environment:
       - MM_OVERRIDE_DEFAULT_MODULES
       - MM_OVERRIDE_CSS
@@ -19,51 +13,9 @@ services:
       - MM_SCENARIO
       - MM_MODULES_DIR
       - MM_CUSTOMCSS_FILE
-    ports:
-      - ${MM_SERVER_PORTS}
     extends:
       service: base
-  server_init:
-    depends_on:
-      init:
-        condition: service_completed_successfully
-    extends:
-      service: server_no
-  electron_no:
-    extends:
-      service: base
-    volumes:
-      # removes error messages, not needed for running:
-      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
-      # xserver:
-      - /tmp/.X11-unix:/tmp/.X11-unix
-      - $HOME/.Xauthority:/home/node/.Xauthority
-      # labwc
-      - $LAB_WC_SOCK_DIR:$LAB_WC_SOCK_DIR
-    privileged: true
-    devices:
-      - /dev/vchiq
-    environment:
-      - MM_OVERRIDE_DEFAULT_MODULES
-      - MM_OVERRIDE_CSS
-      - MM_SHOW_CURSOR
-      - MM_SCENARIO
-      - MM_MODULES_DIR
-      - MM_CUSTOMCSS_FILE
-      # xserver:
-      - DISPLAY=unix:0.0
-      # labwc
-      - WAYLAND_DISPLAY=wayland-0
-      - XDG_RUNTIME_DIR=${LAB_WC_SOCK_DIR}
-    network_mode: host
-    shm_size: "128mb"
-  electron_init:
-    depends_on:
-      init:
-        condition: service_completed_successfully
-    extends:
-      service: electron_no
-  client_no:
+  gui:
     image: ${MM_IMAGE}
     volumes:
       # removes error messages, not needed for running:
@@ -80,5 +32,36 @@ services:
       # labwc
       - WAYLAND_DISPLAY=wayland-0
       - XDG_RUNTIME_DIR=${LAB_WC_SOCK_DIR}
-    shm_size: "128mb"
+    shm_size: "256mb"
+  base_electron:
+    volumes:
+      - ${VOLUME_CONFIG}
+      - ${VOLUME_MODULES}
+      - ${VOLUME_CSS}
+    environment:
+      - MM_OVERRIDE_DEFAULT_MODULES
+      - MM_OVERRIDE_CSS
+      - MM_SHOW_CURSOR
+      - MM_SCENARIO
+      - MM_MODULES_DIR
+      - MM_CUSTOMCSS_FILE
+    extends:
+      service: gui
+  # server
+  server:
+    ports:
+      - ${MM_SERVER_PORTS}
+    extends:
+      service: base_env
+  # electron
+  electron:
+    extends:
+      service: base_electron
+    devices:
+      - /dev/vchiq
+    network_mode: host
+  # client
+  client:
+    extends:
+      service: gui
     command: "node clientonly --address ${MM_CLIENT_ADDRESS} --port ${MM_CLIENT_PORT}"
