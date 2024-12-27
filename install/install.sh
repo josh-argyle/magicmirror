@@ -50,6 +50,16 @@ else
   _sudo="sudo"
 fi
 
+if [[ -d "/run/systemd" ]]; then
+  for ((i=1;i<=20;i++)); do
+    if [[ -f "/run/systemd/timesync/synchronized" ]]; then
+      break
+    fi
+    [[ i -eq 1 ]] && echo "waiting for timesync " || echo -n "."
+    sleep 5s
+  done
+fi
+
 cd "$base/run"
 
 [[ -f "compose.yaml" ]] || cp original.compose.yaml compose.yaml
