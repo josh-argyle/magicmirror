@@ -130,8 +130,10 @@ if [ "$STARTENV" = "test" ]; then
 
   _info "start tests"
 
-  Xvfb :99 -screen 0 1024x768x16 &
-  export DISPLAY=:99
+  export XDG_RUNTIME_DIR=/tmp/labwc
+  mkdir -p $XDG_RUNTIME_DIR
+  WLR_BACKENDS=headless WLR_LIBINPUT_NO_DEVICES=1 WLR_RENDERER=pixman labwc &
+  export WAYLAND_DISPLAY=wayland-0
 
   cd ${base}
 
