@@ -3,6 +3,10 @@
 sudo chown -R pi:pi $XDG_RUNTIME_DIR
 sudo seatd -u pi -g pi &
 
+if [[ "$LAB_WC_HIDE_CURSOR" == "true" ]]; then
+  sudo cp /usr/share/icons/Adwaita/cursors/transparent /usr/share/icons/Adwaita/cursors/left_ptr
+fi
+
 if [[ "$RANDR_PARAMS" != "" ]]; then
   labwc &
   sleep $RANDR_DELAY

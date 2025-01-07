@@ -7,6 +7,7 @@ services:
       - XDG_RUNTIME_DIR=${LAB_WC_SOCK_DIR}
       - RANDR_PARAMS
       - RANDR_DELAY
+      - LAB_WC_HIDE_CURSOR
     volumes:
       - $LAB_WC_SOCK_DIR:$LAB_WC_SOCK_DIR
     privileged: true
