@@ -11,8 +11,11 @@ apt-get install -y labwc sudo wlr-randr
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 groupadd -g 1000 $APP_USER
+groupadd -g 105 render
 useradd -u 1000 -g $APP_USER --shell /bin/bash --create-home $APP_USER
-usermod -a -G sudo $APP_USER
+# video is needed on e.g. pi2, pi3
+# render reduces error messages
+usermod -a -G video,render,sudo $APP_USER
 echo "$APP_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 EOF
 
