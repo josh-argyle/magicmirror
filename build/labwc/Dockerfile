@@ -24,6 +24,7 @@ COPY transparent /usr/share/icons/Adwaita/cursors/transparent
 
 USER $APP_USER
 
-ENV WLR_LIBINPUT_NO_DEVICES=1
+ENV WLR_LIBINPUT_NO_DEVICES=1 \
+    LAB_WC_HIDE_CURSOR=true
 
 ENTRYPOINT ["/entrypoint.sh"]
