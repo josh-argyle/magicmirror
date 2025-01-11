@@ -10,4 +10,6 @@ services:
       - LAB_WC_HIDE_CURSOR
     volumes:
       - $LAB_WC_SOCK_DIR:$LAB_WC_SOCK_DIR
+      # needed for activating input devices, e.g. mouse:
+      - /run/udev:/run/udev
     privileged: true
