@@ -35,7 +35,7 @@ USER root
 RUN set -e; \
     apt-get update; \
     DEBIAN_FRONTEND=noninteractive apt-get -qy --allow-unauthenticated install python3 python3-pip; \
-    pip3 install pychromecast; \
+    pip3 install pychromecast --break-system-packages; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*; \
     python3 --version;
