@@ -1,19 +1,18 @@
 ---
-layout: single
 title: Installation
-permalink: /installation/
 ---
+
 ## Installation prerequisites
 
 - [Docker](https://docs.docker.com/engine/installation/)
 - to run `docker` commands without needing `sudo` please refer to the [linux postinstall documentation](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user)
-- as we are using `docker compose` commands the compose plugin must be installed. If missing you find [here](https://docs.docker.com/compose/install/linux/) instructions how to install it. ⚠️ This setup needs `docker compose` version `2.20.3` or above, you can check the version with `docker compose version`. If you don't want to use compose, see [this section in the FAQ](/magicmirror/faq/#how-to-start-magicmirror-without-using-composeyaml-files)
+- as we are using `docker compose` commands the compose plugin must be installed. If missing you find [here](https://docs.docker.com/compose/install/linux/) instructions how to install it. ⚠️ This setup needs `docker compose` version `2.20.3` or above, you can check the version with `docker compose version`. If you don't want to use compose, see [this section in the FAQ](/docs/faq.html#how-to-start-magicmirror2-without-using-compose-yaml-files)
 
 ## Additional prerequisites for running on a raspberry pi with Scenario **electron** ✌️ or **client** 👌
 
-- disable the screensaver (depends on the underlying os), otherwise MagicMirror will disappear after a while.
-- enable "Wait for Network at Boot" (with `sudo raspi-config`, navigate to "3 boot options" and choose "B2 Wait for Network at Boot"). If not set, some modules will remaining in "loading..." state because MagicMirror starts to early.
-- when using wlan you should disable "power_save" (depends on the underlying os, e.g. `sudo iw wlan0 set power_save off`), otherwise MagicMirror can not update the displayed data without working internet connection.
+- disable the screensaver (depends on the underlying os), otherwise MagicMirror² will disappear after a while.
+- enable "Wait for Network at Boot" (with `sudo raspi-config`, navigate to "3 boot options" and choose "B2 Wait for Network at Boot"). If not set, some modules will remaining in "loading..." state because MagicMirror² starts to early.
+- when using wlan you should disable "power_save" (depends on the underlying os, e.g. `sudo iw wlan0 set power_save off`), otherwise MagicMirror² can not update the displayed data without working internet connection.
 
 ## Installation of this Repository
 
@@ -62,7 +61,7 @@ MM_INIT="no_init"
 
 ### Using own compose file
 
-If you have an own compose file where you want to add this setup you can use the install script or manual install and then run `docker compose config` in the `magicmirror/run` folder. You can copy/paste the output in your existing compose file. There are more informations in the [FAQ](/magicmirror/faq/#how-to-start-magicmirror-without-using-composeyaml-files).
+If you have an own compose file where you want to add this setup you can use the install script or manual install and then run `docker compose config` in the `magicmirror/run` folder. You can copy/paste the output in your existing compose file. There are more informations in the [FAQ](/docs/faq.html#how-to-start-magicmirror2-without-using-compose-yaml-files).
 
 A minimal compose file for scenario **server** ☝️ is:
 
@@ -88,7 +87,7 @@ Navigate to `~/magicmirror/run` and execute
 docker compose up -d
 ```
 
-The container will start and with scenario **electron** ✌️ or **client** 👌 the MagicMirror should appear on the screen of your pi. In server only mode opening a browser at `http://localhost:8080` should show the MagicMirror (scenario **server** ☝️).
+The container will start and with scenario **electron** ✌️ or **client** 👌 the MagicMirror² should appear on the screen of your pi. In server only mode opening a browser at `http://localhost:8080` should show the MagicMirror² (scenario **server** ☝️).
 
 > The container is configured to restart automatically so after executing `docker compose up -d` it will also restart after a reboot of your pi.
 
@@ -109,7 +108,7 @@ will show all containers and
 docker compose down
 ```
 
-will stop and remove the MagicMirror container.
+will stop and remove the MagicMirror² container.
 
 You can restart the container with one command `docker compose up -d --force-recreate`. This is e.g. necessary if you change the configuration.
 

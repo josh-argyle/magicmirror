@@ -1,12 +1,10 @@
 ---
-layout: single
 title: Pi Related Modules
-permalink: /pi-modules/
 ---
 
 Many modules are working out of the box with this docker setup. But if you want to use modules which needs hardware of the raspberry pi the setup can be tricky. This step-by-step example is a showcase how to solve such problems when you want to use a PIR motion sensor.
 
-# MagicMirror with PIR motion sensor
+# MagicMirror² with PIR motion sensor
 
 ## Install module MMM-Pir-Sensor-Lite
 
@@ -50,7 +48,7 @@ To get this working you have to add an additional device into your `compose.yaml
 After restarting the container our PIR-Sensor should now work, you should see the countdown in the upper right corner.
 You can interrupt the countdown by waking the sensor up. After 20 sec. without motion the screen should go off, you can wake up the screen with the sensor.
 
-One ugly thing is now left because in my setup MagicMirror is not running in fullscreen anymore. This is related to the `xrandr` calls which are activating the monitor. As solution I found only a workaround, put the following `electronOptions` into your `config.js` file
+One ugly thing is now left because in my setup MagicMirror² is not running in fullscreen anymore. This is related to the `xrandr` calls which are activating the monitor. As solution I found only a workaround, put the following `electronOptions` into your `config.js` file
 
 ```javascript
 let config = {

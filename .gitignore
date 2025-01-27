@@ -6,3 +6,8 @@ Gemfile*
 pages/_site
 run/.env
 *-sav
+node_modules/
+.cache
+.temp
+package-lock.json
+dist/

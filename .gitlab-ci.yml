@@ -71,13 +71,14 @@ variables:
 
 pages:
   stage: build
-  image: ${CI_REGISTRY}/khassel/jekyll:latest
+  image: node:${NODE_VERSION_MASTER}-alpine
   script:
-    - cp -v .gitlab-ci.yml ${CI_PROJECT_DIR}/pages/_data/gitlab.yml
-    - uglify.sh ${CI_PROJECT_DIR}/pages/assets/js
-    - cd pages
-    - cp -v $HOME/Gemfile .
-    - bundle exec jekyll build -d ${CI_PROJECT_DIR}/public
+    - |
+      apk add gojq bash
+      cd pages
+      chmod +x replacevars
+      npm i
+      npm run build:ci
   artifacts:
     paths:
       - public
