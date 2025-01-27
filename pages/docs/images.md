@@ -2,7 +2,7 @@
 title: Docker Images
 ---
 
-> ⚠️ Changes in Aug. 2024 (see [installation](/docs/installation.html#init-container-and-running-as-root))
+> ⚠️ Changes in Aug. 2024 (see [installation](/magicmirror/docs/installation.html#init-container-and-running-as-root))
 > - `sudo` removed (use user `root`)
 > - updating volume permissions on startup removed (use init container)
 

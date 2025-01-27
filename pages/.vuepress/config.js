@@ -8,6 +8,10 @@ export default defineUserConfig({
   bundler: viteBundler(),
   theme: defaultTheme({
     logo: "logo.png",
+    navbar: [{ text: "Forum", link: "https://forum.magicmirror.builders" }],
+    repo: "https://gitlab.com/khassel/magicmirror",
+    repoLabel: "GitLab",
+    editLink: false,
     sidebar: [
       {
         text: "Docker setup",
