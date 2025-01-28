@@ -2,86 +2,53 @@
 title: Pi Related Modules
 ---
 
-Many modules are working out of the box with this docker setup. But if you want to use modules which needs hardware of the raspberry pi the setup can be tricky. This step-by-step example is a showcase how to solve such problems when you want to use a PIR motion sensor.
+Many modules are working out of the box with this docker setup. But if you want to use modules which needs hardware of the raspberry pi the setup can be tricky.
 
 # MagicMirror² with PIR motion sensor
 
-## Install module MMM-Pir-Sensor-Lite
+## Install module MMM-Universal-Pir
 
-Start the container and login with `docker exec -it mm bash`. Navigate to the `modules` folder and clone [MMM-PIR-Sensor-Lite](https://github.com/grenagit/MMM-PIR-Sensor-Lite.git) with `git clone https://github.com/grenagit/MMM-PIR-Sensor-Lite.git`. Now `cd` into the new folder `MMM-PIR-Sensor-Lite` and run `npm install`.
+Start this setup with scenario **electron** ✌️and with a labwc(wayland) setup on your raspberry pi (or using this setup with `labwc` container). Login into the mm container with `docker exec -it mm bash`. Navigate to the `modules` folder and clone [MMM-Universal-Pir](https://gitlab.com/khassel/MMM-Universal-Pir) with `git clone https://gitlab.com/khassel/MMM-Universal-Pir.git`.
 
-## Configure MMM-PIR-Sensor-Lite
+## Configure MMM-Universal-Pir
 
 Every module needs to be configured in the `config.js` file. Here is my config for testing the module:
 
 ```javascript
   {
-    module: "MMM-PIR-Sensor-Lite",
+    module: "MMM-Universal-Pir",
     position: "top_right",
     config: {
-      sensorPin: 23, // GPIO pin
-      deactivateDelay: 20000, // 20 sec
-      showCountDown: true,
-      showDetection: true,
+      gpioCommand: "gpiomon -r -b gpiochip0 23",
+      onCommand: "wlr-randr --output HDMI-A-1 --on",
+      offCommand: "wlr-randr --output HDMI-A-1 --off",
+      deactivateDelay: 20 * 1000,
     }
   }
 ```
 
-The `sensorPin` is the gpio pin where you plugged in the motion sensor.
-After updating the `config.js` you have to restart the container.
+The last parameter in the `gpioCommand` is the gpio pin where you plugged in the motion sensor, you have to adjust this number.
+If you are using another HDMI port you have to adjust the on/off commands, you can run `wlr-randr` and find the HDMI port in the first line of the output (in above example `HDMI-A-1`). After updating the `config.js` you have to restart the container.
 
-But the module will not work with the default image `karsten13/magicmirror:latest`, the module will remain in `Loading...` state.
-
-The module needs `python3` to work which is not installed in `karsten13/magicmirror:latest`. We could build a custom image on top and install `python3` but the simpler solution is to use `karsten13/magicmirror:fat` where `python3` is already included.
-
-So update `MM_IMAGE` in your `.env` file with the new image and restart the container.
-
-But the PIR-Sensor still does'nt work, because the used python script fails with: `RuntimeError: No access to /dev/mem.  Try running as root!`.
-
-To get this working you have to add an additional device into your `compose.yaml`:
-
-```yaml
-    devices:
-      - /dev/gpiomem
-```
-
-After restarting the container our PIR-Sensor should now work, you should see the countdown in the upper right corner.
+After restart the PIR-Sensor should work, you should see the countdown in the upper right corner.
 You can interrupt the countdown by waking the sensor up. After 20 sec. without motion the screen should go off, you can wake up the screen with the sensor.
-
-One ugly thing is now left because in my setup MagicMirror² is not running in fullscreen anymore. This is related to the `xrandr` calls which are activating the monitor. As solution I found only a workaround, put the following `electronOptions` into your `config.js` file
-
-```javascript
-let config = {
-  electronOptions: {
-    width: 1920,
-    height: 1080,
-    alwaysOnTop: true,
-  },
-  address: "0.0.0.0",
-  ...
-```
-
-where the `width` and `height` values should match with your screen resolution. If someone has a better solution for the fullscreen problem please let me know.
 
 ## Debugging
 
-Start the container and login with `docker exec -it mm bash`.
+If something is not working you can test the above commands locally on the host.
 
-Test if you can activate/deactivate the monitor by running:
+`gpiomon -r -b gpiochip0 23` should provide some output if you touch the sensor, the `wlr-randr` commands should enable/disable the screen.
 
-- deactivate: `xrandr --output HDMI-1 --off`
-- activate: `xrandr --output HDMI-1 --rotate normal --auto`
+If they are working start the container and login with `docker exec -it mm bash` and try the same commands in the container. The container is running `privileged` so if the commands are not working inside could indicate a missing group.
 
-Test if your PIR-Sensor is working by running:
+## Labwc(Wayland) and XServer
 
-`python3 -u modules/MMM-PIR-Sensor-Lite/pir.py 23` where `23` is the used GPIO pin.
+This example was made assuming that Labwc(Wayland) is used. If you are using XServer/X11/Xorg you have to replace the `wlr-randr` commands with corresponding `xrandr` commands.
 
-Output should look like
+## Running unprivileged
 
-```bash
-PIR_START
-USER_PRESENCE
-USER_PRESENCE
-```
+With scenario **electron** ✌️ the container is started privileged. This is needed here for allowing the container to execute the above commands. If you want to run unprivileged you have to figure out which devices (and volumes) are needed and map them in your `compose.yaml`.
 
-where every line `USER_PRESENCE` represents a motion detection.
+## Other hardware related modules
+
+If you are missing binaries (e.g. `python`) which are needed by a module see [this section in the FAQ](/magicmirror/docs/faq.html#how-to-install-os-dependencies-needed-by-a-module).

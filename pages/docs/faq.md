@@ -43,22 +43,28 @@ USER node
 
 ### Use a start script
 
-This is the preferred solution if you need only a few dependencies and start time of MagicMirror² doesn't matter.
+This is the preferred solution if you need only a few dependencies and start time of MagicMirror² doesn't matter. For this you have to write a `start_script.sh` file which can be used inside the container.
 
-For this you have to write a `start_script.sh` file and put this beside your `compose.yaml` file. Additionally the `start_script.sh` file must be mapped into the container so you need to add a `volumes` section to your `compose.yaml` file and add the root user to be able to install packages:
-
-```yaml
-    user: root
-    volumes:
-      - ./start_script.sh:/opt/magic_mirror/start_script.sh
-```
-
-Here an example for the content of `start_script.sh`. If you want to use [MMM-ServerStatus](https://github.com/XBCreepinJesus/MMM-ServerStatus) you need to install the missing `ping` command. This is done by this `start_script.sh`:
+Here an example for the content of `start_script.sh`. If you want to use e.g. [MMM-ServerStatus](https://github.com/XBCreepinJesus/MMM-ServerStatus) you need to install the missing `ping` command. This is done by this `start_script.sh`:
 
 ```bash
 #!/bin/sh
 apt-get update
 apt-get install -y iputils-ping
+```
+
+#### Option1: Config directory
+
+You can add the `start_script.sh` beside the `config.js` on the host (in `~/magicmirror/mounts/config`).
+
+#### Option2: Additional volume mount
+
+Put the `start_script.sh` file beside your `compose.yaml` file. Additionally the `start_script.sh` file must be mapped into the container so you need to add a `volumes` section to your `compose.yaml` file and add the root user to be able to install packages:
+
+```yaml
+    user: root
+    volumes:
+      - ./start_script.sh:/opt/magic_mirror/start_script.sh
 ```
 
 ### Use the `fat` image
@@ -221,4 +227,12 @@ This fix is persistent because the `modules` folder is mounted to the host. If y
 
 ## Running on a raspberry pi ends with a white or black screen after a while
 
-I had this behavior running the module `MMM-RAIN-MAP` which is fetching a greater amount of images for the map. So if you are running modules which needs a greater amount of shared memory, you have to increase `shm_size` in the `compose.yaml`. The default there is `shm_size: "128mb"` so edit this value and restart the container with `docker compose up -d`.
+I had this behavior running the module `MMM-RAIN-MAP` which is fetching a greater amount of images for the map. So if you are running modules which needs a greater amount of shared memory, you have to increase `shm_size` in the `compose.yaml`. The default used is `shm_size: "256mb"` so if you need a higher value add a new line
+
+```yaml
+services:
+  magicmirror:
+    shm_size: "512mb"
+```
+
+in `compose.yaml` and restart the container with `docker compose up -d`.
