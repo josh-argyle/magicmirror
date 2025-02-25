@@ -17,6 +17,11 @@ useradd -u 1000 -g $APP_USER --shell /bin/bash --create-home $APP_USER
 # render reduces error messages
 usermod -a -G video,render,sudo $APP_USER
 echo "$APP_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+# some tests:
+sudo --version
+seatd -v
+labwc --version
+which wlr-randr
 EOF
 
 COPY --chmod=755 entrypoint.sh /entrypoint.sh

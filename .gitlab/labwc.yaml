@@ -15,7 +15,7 @@ build_labwc:
   script:
     - |
       if [ "${CI_COMMIT_BRANCH}" = "master" ]; then
-        export PUSH_IMAGES="karsten13/labwc:latest"
+        export PUSH_IMAGES="karsten13/labwc:latest,karsten13/labwc:$(date '+%F')"
       else
         export PUSH_IMAGES="karsten13/labwc:${CI_COMMIT_BRANCH}"
       fi
