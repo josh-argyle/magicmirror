@@ -7,7 +7,7 @@ ENV APP_USER="pi"
 RUN <<EOF
 set -e
 apt-get update
-apt-get install -y labwc sudo wlr-randr
+apt-get install -y labwc sudo wlr-randr seatd
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 groupadd -g 1000 $APP_USER
