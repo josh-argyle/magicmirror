@@ -40,8 +40,6 @@ test_electron_rebuild:
       npx electron -v
       echo "install additional dependencies:"
       npm install @electron/rebuild onoff node-pty drivelist
-      # fix for nan and electron rebuild as long as https://github.com/nodejs/nan/pull/979 is not merged:
-      sed -i 's|^#include .nan_scriptorigin\.h.*||g' ./node_modules/nan/nan.h
       echo "electron-rebuild version:"
       npx electron-rebuild --version
       echo "run electron-rebuild:"
