@@ -7,7 +7,7 @@ include:
 services:
   magicmirror:
     container_name: mm
-    restart: unless-stopped
+    restart: always
     extends:
       file: includes/base.yaml
       service: ${MM_SCENARIO}

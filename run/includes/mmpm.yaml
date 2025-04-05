@@ -15,4 +15,4 @@ services:
       - ../../mounts/config:/home/node/MagicMirror/config
       - ../../mounts/${MM_CUSTOMCSS_FILE}:/home/node/MagicMirror/css/custom.css
       - ../../mounts/mmpm-config:/home/node/.config/mmpm
-    restart: unless-stopped
+    restart: always

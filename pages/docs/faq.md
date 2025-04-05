@@ -87,7 +87,7 @@ include:
 services:
   magicmirror:
     container_name: mm
-    restart: unless-stopped
+    restart: always
     extends:
       file: includes/base.yaml
       service: ${MM_SCENARIO}_${MM_INIT}
@@ -108,7 +108,7 @@ services:
         target: 8080
         published: "8080"
         protocol: tcp
-    restart: unless-stopped
+    restart: always
     volumes:
       - type: bind
         source: /mnt/z/k13/magicmirror/mounts/config

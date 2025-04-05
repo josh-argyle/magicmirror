@@ -70,7 +70,7 @@ services:
   magicmirror:
     container_name: mm
     image: karsten13/magicmirror:latest
-    restart: unless-stopped
+    restart: always
     volumes:
       - ../mounts/config:/opt/magic_mirror/config
       - ../mounts/modules:/opt/magic_mirror/modules

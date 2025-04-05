@@ -8,4 +8,4 @@ services:
     # --interval 300 --> poll interval in seconds
     # --cleanup --> for auto image pruning
     command: --interval ${MM_WATCHTOWER_INTERVAL} ${MM_WATCHTOWER_CLEANUP}
-    restart: unless-stopped
+    restart: always

@@ -54,12 +54,12 @@ if [ -z "$TZ" ]; then
   if [ -w /etc/localtime ]; then
     ln -fs /usr/share/zoneinfo/$TZ /etc/localtime
   else
-    _info "***WARNING*** could write to /etc/localtime"
+    _info "***WARNING*** could not write to /etc/localtime"
   fi
   if [ -w /etc/timezone ]; then
     echo "$TZ" > /etc/timezone
   else
-    _info "***WARNING*** could write to /etc/timezone"
+    _info "***WARNING*** could not write to /etc/timezone"
   fi
 fi
 
