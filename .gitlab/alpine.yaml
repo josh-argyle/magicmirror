@@ -61,7 +61,8 @@ sync_alpine:
       docker.gitlab.login
       if [ "${CI_COMMIT_BRANCH}" = "master" ]; then
         docker.manifest "${CI_REGISTRY_IMAGE}:alpine" "alpine"
-        docker.sync "${CI_REGISTRY_IMAGE}:alpine"
+        docker.manifest "${CI_REGISTRY_IMAGE}:alpine" "${MAGICMIRROR_VERSION}_alpine"
+        docker.sync "${CI_REGISTRY_IMAGE}:alpine ${CI_REGISTRY_IMAGE}:${MAGICMIRROR_VERSION}_alpine"
       else
         docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_alpine" "${CI_COMMIT_BRANCH}_alpine"
         docker.sync "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_alpine"
