@@ -1,7 +1,7 @@
 # start with: dc run --rm --name mm --service-ports magicmirror
 services:
   magicmirror:
-    image: registry.gitlab.com/khassel/magicmirror:develop_debug23
+    image: registry.gitlab.com/khassel/magicmirror:develop_debug24
     environment:
       - XDG_RUNTIME_DIR=/tmp
 #      LD_PRELOAD: /usr/local/lib/libfaketime.so.1

@@ -10,10 +10,10 @@
   environment:
     name: "$CI_COMMIT_BRANCH/Test MagicMirror"
 
-test_debug23:
-  needs: ["build_debug23"]
+test_debug24:
+  needs: ["build_debug24"]
   image:
-    name: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_debug23
+    name: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_debug24
     entrypoint: [""]
   extends:
     - .test_debug

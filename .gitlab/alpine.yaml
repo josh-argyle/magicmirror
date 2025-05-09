@@ -4,6 +4,10 @@
     - |
       set -e
       set | grep -E "BUILDER_IMG=|NODE_VERSION=|ADD_TAG="
+      if [ "$ADD_TAG" = "arm" ] && [ "$NODE_VERSION" > "23" ]; then
+        echo "skipping this build because there is no node version $NODE_VERSION for $ADD_TAG"
+        exit 0
+      fi
       dest="--destination ${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_alpine_${ADD_TAG}"
       if [ "${CI_COMMIT_BRANCH}" = "master" ]; then
         dest="${dest} --destination ${CI_REGISTRY_IMAGE}:alpine_${ADD_TAG}"

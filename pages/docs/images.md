@@ -26,14 +26,14 @@ Version {{ MAGICMIRROR_VERSION }} is the current release of MagicMirror. Older v
 
 ⛔ The following experimental images are not for production use:
 
-TAG                | OS/ARCH     | ELECTRON | DISTRO                                   | DESCRIPTION
------------------- | ----------- | -------- | -----------------------------------------|------------------------------------------
-**develop**        | linux/amd64 | no       | debian {{ DEBIAN_VERSION_DEVELOP }} slim | for x86, only `serveronly`-mode
-**develop**        | linux/arm   | yes      | debian {{ DEBIAN_VERSION_DEVELOP }} slim | for raspberry pi 32-Bit os
-**develop**        | linux/arm64 | yes      | debian {{ DEBIAN_VERSION_DEVELOP }} slim | for raspberry pi 64-Bit os
-**develop_fat**    | linux/amd64 | yes      | debian {{ DEBIAN_VERSION_DEVELOP }}      | for x86
-**develop_fat**    | linux/arm   | yes      | debian {{ DEBIAN_VERSION_DEVELOP }}      | for raspberry pi 32-Bit os
-**develop_fat**    | linux/arm64 | yes      | debian {{ DEBIAN_VERSION_DEVELOP }}      | for raspberry pi 64-Bit os
-**develop_alpine** | all 3 archs | no       | alpine                                   | only `serveronly`-mode, smaller in size
+TAG                | OS/ARCH                     | ELECTRON | DISTRO                                   | DESCRIPTION
+------------------ | --------------------------- | -------- | -----------------------------------------|------------------------------------------
+**develop**        | linux/amd64                 | no       | debian {{ DEBIAN_VERSION_DEVELOP }} slim | for x86, only `serveronly`-mode
+**develop**        | linux/arm64                 | yes      | debian {{ DEBIAN_VERSION_DEVELOP }} slim | for raspberry pi 64-Bit os
+**develop_fat**    | linux/amd64                 | yes      | debian {{ DEBIAN_VERSION_DEVELOP }}      | for x86
+**develop_fat**    | linux/arm64                 | yes      | debian {{ DEBIAN_VERSION_DEVELOP }}      | for raspberry pi 64-Bit os
+**develop_alpine** | linux/amd64 and linux/amd64 | no       | alpine                                   | only `serveronly`-mode, smaller in size
 
 These images are using the `develop` branch of the MagicMirror² git repository and Node version {{ NODE_VERSION_DEVELOP }}.
+
+> There are currently no node v{{ NODE_VERSION_DEVELOP }} images for `linux/arm` available.

@@ -6,6 +6,10 @@
       [ -z "${SLIM}" ] && export FAT="_fat"
       [ "${dev}" == "dn" ] && export NODE_ENV="production" || export NODE_ENV="test"
       set | grep -E "BUILDER_IMG=|NODE_VERSION=|buildarch=|FAT=|DEBIAN_VERSION=|ADD_TAG="
+      if [ "$ADD_TAG" = "arm" ] && [ "$NODE_VERSION" > "23" ]; then
+        echo "skipping this build because there is no node version $NODE_VERSION for $ADD_TAG"
+        exit 0
+      fi
       build --context "./build" \
         --dockerfile "Dockerfile-debian" \
         --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}${FAT}_${ADD_TAG}" \
@@ -107,10 +111,10 @@ build_debug22:
   extends:
     - .build_debug
 
-build_debug23:
+build_debug24:
   variables:
-    ADD_TAG: "debug23"
-    NODE_VERSION: "23"
+    ADD_TAG: "debug24"
+    NODE_VERSION: "24"
   extends:
     - .build_debug
 
