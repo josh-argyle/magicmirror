@@ -1,6 +1,6 @@
 ARG NODE_VERSION
 FROM registry.gitlab.com/khassel/container/node-prune:latest as prune
-FROM node:${NODE_VERSION}-alpine as builder
+FROM node:${NODE_VERSION} as builder
 
 WORKDIR /opt/magic_mirror
 
@@ -8,7 +8,6 @@ COPY --from=prune /node-prune /usr/local/bin/node-prune
 COPY build_info.sh /tmp
 
 RUN set -e; \
-    apk add --no-cache git; \
     chmod +x /tmp/build_info.sh;
 
 ARG GIT_INFO
