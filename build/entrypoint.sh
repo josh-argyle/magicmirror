@@ -138,13 +138,13 @@ if [ "$STARTENV" = "test" ]; then
   cd ${base}
 
   echo "/mount_ori/**/*" >> .prettierignore
-  npm run test:prettier
-  npm run test:js
-  npm run test:css
-  npm run test:markdown
-  npm run test:unit
-  npm run test:e2e
-  npm run test:electron
+  node --run test:prettier
+  node --run test:js
+  node --run test:css
+  node --run test:markdown
+  node --run test:unit
+  node --run test:e2e
+  node --run test:electron
 else
   _script=""
   if [ -f "start_script.sh" ]; then
@@ -173,23 +173,23 @@ else
       # ... and no scenario set, then add defaults depending if electron is installed:
       if command -v node_modules/.bin/electron > /dev/null; then
         if [ -S $XDG_RUNTIME_DIR/wayland-0 ]; then
-          _start_mm npm run start:wayland
+          _start_mm node --run start:wayland
         else
           _start_mm npm start
         fi
       else
-        _start_mm npm run server
+        _start_mm node --run server
       fi
     else
       # ... add defaults depending of the scenario:
       if [ "$MM_SCENARIO" = "electron" ]; then
         if [ -S $XDG_RUNTIME_DIR/wayland-0 ]; then
-          _start_mm npm run start:wayland
+          _start_mm node --run start:wayland
         else
           _start_mm npm start
         fi
       else
-        _start_mm npm run server
+        _start_mm node --run server
       fi
     fi
   else
