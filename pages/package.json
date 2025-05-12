@@ -15,9 +15,9 @@
   "license": "MIT",
   "description": "Documentation for MagicMirror² Docker Setup",
   "devDependencies": {
-    "@vuepress/bundler-vite": "2.0.0-rc.22",
-    "@vuepress/theme-default": "2.0.0-rc.102",
-    "sass-embedded": "1.87.0",
-    "vuepress": "2.0.0-rc.22"
+    "@vuepress/bundler-vite": "2.0.0-rc.23",
+    "@vuepress/theme-default": "2.0.0-rc.103",
+    "sass-embedded": "1.88.0",
+    "vuepress": "2.0.0-rc.23"
   }
 }
