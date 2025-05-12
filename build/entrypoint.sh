@@ -30,7 +30,7 @@ _start_mm() {
     rm -f $_file
     echo "export START_CMD=\"$@\"" > $_file
     for _line in $(env); do
-      if echo "$_line" | grep -Eq '^(DISPLAY.*|MM_.*|NODE.*|DBUS.*|ELECTRON.*|TZ.*)$'; then
+      if echo "$_line" | grep -Eq '^(XDG.*|.*DISPLAY.*|MM_.*|NODE.*|DBUS.*|ELECTRON.*|TZ.*)$'; then
         echo "export $_line" >> $_file
       fi
     done

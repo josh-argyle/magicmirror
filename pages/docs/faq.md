@@ -55,11 +55,17 @@ apt-get install -y iputils-ping
 
 #### Option1: Config directory
 
-You can add the `start_script.sh` beside the `config.js` on the host (in `~/magicmirror/mounts/config`).
+You can add the `start_script.sh` beside the `config.js` on the host (in `~/magicmirror/mounts/config`). Because the `apt-get` command require root access you must add
+
+```yaml
+    user: root
+```
+
+to your `compose.yaml`.
 
 #### Option2: Additional volume mount
 
-Put the `start_script.sh` file beside your `compose.yaml` file. Additionally the `start_script.sh` file must be mapped into the container so you need to add a `volumes` section to your `compose.yaml` file and add the root user to be able to install packages:
+Put the `start_script.sh` file beside your `compose.yaml` file. Additionally the `start_script.sh` file must be mapped into the container so you need to add a `volumes` section to your `compose.yaml` file (and add the root user to be able to install packages):
 
 ```yaml
     user: root
