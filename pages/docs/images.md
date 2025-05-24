@@ -32,7 +32,7 @@ TAG                | OS/ARCH                     | ELECTRON | DISTRO            
 **develop**        | linux/arm64                 | yes      | debian {{ DEBIAN_VERSION_DEVELOP }} slim | for raspberry pi 64-Bit os
 **develop_fat**    | linux/amd64                 | yes      | debian {{ DEBIAN_VERSION_DEVELOP }}      | for x86
 **develop_fat**    | linux/arm64                 | yes      | debian {{ DEBIAN_VERSION_DEVELOP }}      | for raspberry pi 64-Bit os
-**develop_alpine** | linux/amd64 and linux/amd64 | no       | alpine                                   | only `serveronly`-mode, smaller in size
+**develop_alpine** | linux/amd64 and linux/arm64 | no       | alpine                                   | only `serveronly`-mode, smaller in size
 
 These images are using the `develop` branch of the MagicMirror² git repository and Node version {{ NODE_VERSION_DEVELOP }}.
 

@@ -98,7 +98,7 @@ test_alpine:
         BuildRef="develop"
       fi
       cd /tmp
-      git clone --depth 1 -b "${BuildRef}" --single-branch "${GitRepo}" mm
+      git clone --depth 1 -b "${BuildRef}" --single-branch "${GITREPO_URL}" mm
       cd mm
       git log -1 > /tmp/clone.txt
       cat /tmp/image.txt

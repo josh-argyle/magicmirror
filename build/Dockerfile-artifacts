@@ -12,15 +12,15 @@ RUN set -e; \
 
 ARG GIT_INFO
 ARG BuildRef
-ARG GitRepo
+ARG GITREPO_URL
 ARG buildarch
 ARG opt
 ARG dev
 RUN set -e; \
     node -v; \
     echo BuildRef="${BuildRef}"; \
-    echo GitRepo="${GitRepo}"; \
-    git clone --depth 1 -b "${BuildRef}" --single-branch "${GitRepo}" .; \
+    echo GITREPO_URL="${GITREPO_URL}"; \
+    git clone --depth 1 -b "${BuildRef}" --single-branch "${GITREPO_URL}" .; \
     git log -1; \
     npmargs="--no-audit --no-fund --no-update-notifier"; \
     if [ "${buildarch}" = "linux/arm/v7" ]; then \

@@ -43,7 +43,7 @@ bld_art:
       fi
       # clear imagearch to avoid using qemu:
       export imgarch=""
-      set | grep -E "BUILDER_IMG=|NODE_VERSION=|buildarch=|BuildRef=|GitRepo="
+      set | grep -E "BUILDER_IMG=|NODE_VERSION=|buildarch=|BuildRef=|GITREPO_URL="
       build --context "./build" \
       --dockerfile "Dockerfile-artifacts" \
       --destination "${BUILDER_IMG}" \
@@ -53,7 +53,7 @@ bld_art:
       --build-arg opt="${opt}" \
       --build-arg dev="${dev}" \
       --build-arg BuildRef="${BuildRef}" \
-      --build-arg GitRepo="${GitRepo}"
+      --build-arg GITREPO_URL="${GITREPO_URL}"
   extends:
     - .beforescript
   rules:

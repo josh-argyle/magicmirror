@@ -20,7 +20,8 @@ variables:
   NODE_VERSION_DEVELOP: "24"
   DEBIAN_VERSION_MASTER: "bookworm"
   DEBIAN_VERSION_DEVELOP: "bookworm"
-  GitRepo: "https://github.com/MagicMirrorOrg/MagicMirror.git"
+  GITREPO_NAME: "MagicMirrorOrg/MagicMirror"
+  GITREPO_URL: "https://github.com/${GITREPO_NAME}.git"
   TOOLBOX_IMG: "${CI_REGISTRY}/khassel/container/toolbox:latest"
 
 .rule:
@@ -104,20 +105,24 @@ sync_readme:
     url: https://hub.docker.com/r/karsten13/magicmirror
 
 start_dev_build:
+  variables:
+    DEV_BRANCH: "develop"
   image:
-    name: ${DOCKER_USER}/magicmirror:develop_fat
+    name: ${DOCKER_USER}/magicmirror:${DEV_BRANCH}_fat
     entrypoint: [""]
   script:
     - |
-      git config --global --add safe.directory $(pwd)
+      cd /opt/magic_mirror
       current_sha="$(git log -1 --pretty=format:"%H")"
-      curl --output repo.json https://api.github.com/repos/MagicMirrorOrg/MagicMirror/git/ref/heads/develop
+      curl -s --output repo.json https://api.github.com/repos/${GITREPO_NAME}/git/ref/heads/${DEV_BRANCH}
       remote_sha="$(cat repo.json | sed -rn 's|.*"sha": "([a-z,0-9]*).*|\1|p')"
-      if [[ "$current_sha" == "remote_sha" ]]; then
+      echo "current_sha: $current_sha"
+      echo "remote_sha:  $remote_sha"
+      if [[ "$current_sha" == "$remote_sha" ]]; then
         echo "up to date, nothing to do."
       else
-        echo "remote has new commits, starting develop pipeline."
-        curl --request POST "https://gitlab.com/api/v4/projects/10637719/trigger/pipeline?token=${CI_JOB_TOKEN}&ref=develop&variables\[TASK\]=runtime"
+        echo "remote has new commits, starting ${DEV_BRANCH} pipeline."
+        curl --request POST "https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/trigger/pipeline?token=${CI_JOB_TOKEN}&ref=${DEV_BRANCH}&variables\[TASK\]=runtime"
       fi
   rules:
-    - if: $CI_COMMIT_BRANCH == "develop" && $TASK == "checkupdates"
+    - if: $CI_COMMIT_BRANCH == $DEV_BRANCH && $TASK == "checkupdates"
