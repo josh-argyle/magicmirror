@@ -32,11 +32,6 @@ For installing modules refer to the module website, the default modules are desc
 modules' appearance. CSS basics are documented
 [here](https://forum.magicmirror.builders/topic/6808/css-101-getting-started-with-css-and-understanding-how-css-works), among many other places.
 
-> 👉 The css-files in the `css` folder which exists in the MagicMirror² git repo (currently only `main.css`) are overriden with the original file from inside the container with every restart. So if you need to change this file, you must stop this default copying by setting the environment variable `MM_OVERRIDE_CSS` to `false` in the `.env` file:
-```bash
-MM_OVERRIDE_CSS="false"
-```
-
 ## Default Modules
 
 The default modules of MagicMirror² are located in the folder `~/magicmirror/mounts/modules`. These modules are maintained in the MagicMirror² project and not - as other modules - in own git repositories. So if they are mounted the first time outside the container this version remains on the host and would never updated again. To prevent this, the docker container overrides the `default` modules folder with the versions from inside the container.

@@ -30,8 +30,7 @@ RUN set -e; \
 USER node
 
 ENV NODE_ENV=production \
-    MM_OVERRIDE_DEFAULT_MODULES=true \
-    MM_OVERRIDE_CSS=true
+    MM_OVERRIDE_DEFAULT_MODULES=true
 
 EXPOSE 8080
 

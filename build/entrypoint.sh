@@ -1,12 +1,14 @@
 #!/bin/sh
 
 base="/opt/magic_mirror"
-mounted="$(mount | sed -rn 's|.*on\s*'$base'([^ ]*).*|'$base'\1|p' | xargs)"
 
 modules_dir="${base}/modules"
 default_dir="${modules_dir}/default"
 config_dir="${base}/config"
 css_dir="${base}/css"
+
+mounted="$(mount | sed -rn 's|.*on\s*'$base'([^ ]*).*|'$base'\1|p' | xargs)"
+[ -z "${mounted}" ] && mounted="$modules_dir $config_dir $css_dir"
 
 _info() {
   echo "[entrypoint $(date +%T.%3N)] [INFO]   $1"
@@ -14,10 +16,6 @@ _info() {
 
 _error() {
   echo "[entrypoint $(date +%T.%3N)] [ERROR]  $1"
-}
-
-_is_mounted() {
-  echo "$mounted" | grep -Eq ${base}'/'${1}
 }
 
 _start_mm() {
@@ -67,43 +65,33 @@ if [ -z "$TZ" ]; then
   _info "***WARNING*** could not set timezone, please set TZ variable in compose.yaml, see https://khassel.gitlab.io/magicmirror/configuration/#timezone"
 fi
 
-if _is_mounted "modules"; then
-  if [ ! -d "${default_dir}" ]; then
-    MM_OVERRIDE_DEFAULT_MODULES=true
-    mkdir -p ${default_dir}
-  fi
-
-  if [ "${MM_OVERRIDE_DEFAULT_MODULES}" = "true" ]; then
-    if [ -w "${default_dir}" ]; then
-      _info "copy default modules"
-      rm -rf ${default_dir}
-      mkdir -p ${default_dir}
-      cp -r ${base}/mount_ori/modules/default/. ${default_dir}/
-    else
-      _error "No write permission for ${default_dir}, skipping copying default modules"
-    fi
-  fi
-else
-  mkdir -p ${modules_dir}
-  [ -d "${base}/mount_ori/modules/default" ] && mv ${base}/mount_ori/modules/default ${modules_dir}
+if [ ! -d "${default_dir}" ]; then
+  MM_OVERRIDE_DEFAULT_MODULES=true
+  mkdir -p ${default_dir}
 fi
 
-if _is_mounted "css"; then
-  [ ! -f "${css_dir}/main.css" ] && MM_OVERRIDE_CSS=true
-
-  if [ "${MM_OVERRIDE_CSS}" = "true" ]; then
-    if [ -w "${css_dir}" ]; then
-      _info "copy css files"
-      cp ${base}/mount_ori/css/* ${css_dir}/
-      # create css/custom.css file https://github.com/MagicMirrorOrg/MagicMirror/issues/1977
-      [ ! -f "${css_dir}/custom.css" ] && touch ${css_dir}/custom.css
-    else
-      _error "No write permission for ${css_dir}, skipping copying css files"
-    fi
+if [ "${MM_OVERRIDE_DEFAULT_MODULES}" = "true" ]; then
+  if [ -w "${default_dir}" ]; then
+    _info "copy default modules"
+    rm -rf ${default_dir}
+    mkdir -p ${default_dir}
+    cp -r ${base}/mount_ori/modules/default/. ${default_dir}/
+  else
+    _error "No write permission for ${default_dir}, skipping copying default modules"
   fi
-else
-  [ -d "${base}/mount_ori/css" ] && mv ${base}/mount_ori/css ${base}
-  touch ${css_dir}/custom.css
+fi
+
+[ ! -f "${css_dir}/main.css" ] && MM_OVERRIDE_CSS=true
+
+if [ "${MM_OVERRIDE_CSS}" = "true" ]; then
+  if [ -w "${css_dir}" ]; then
+    _info "copy css files"
+    cp ${base}/mount_ori/css/* ${css_dir}/
+    # create css/custom.css file https://github.com/MagicMirrorOrg/MagicMirror/issues/1977
+    [ ! -f "${css_dir}/custom.css" ] && touch ${css_dir}/custom.css
+  else
+    _error "No write permission for ${css_dir}, skipping copying css files"
+  fi
 fi
 
 if [ ! -f "${config_dir}/config.js" ]; then
