@@ -87,12 +87,13 @@ if [ "${MM_OVERRIDE_CSS}" = "true" ]; then
   if [ -w "${css_dir}" ]; then
     _info "copy css files"
     cp ${base}/mount_ori/css/* ${css_dir}/
-    # create css/custom.css file https://github.com/MagicMirrorOrg/MagicMirror/issues/1977
-    [ ! -f "${css_dir}/custom.css" ] && touch ${css_dir}/custom.css
   else
     _error "No write permission for ${css_dir}, skipping copying css files"
   fi
 fi
+
+# create css/custom.css file https://github.com/MagicMirrorOrg/MagicMirror/issues/1977
+[ ! -f "${css_dir}/custom.css" ] && touch ${css_dir}/custom.css
 
 if [ ! -f "${config_dir}/config.js" ]; then
   mkdir -p ${config_dir}
