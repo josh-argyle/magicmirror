@@ -16,8 +16,8 @@
   "description": "Documentation for MagicMirror² Docker Setup",
   "devDependencies": {
     "@vuepress/bundler-vite": "2.0.0-rc.23",
-    "@vuepress/theme-default": "2.0.0-rc.105",
-    "sass-embedded": "1.89.0",
+    "@vuepress/theme-default": "2.0.0-rc.106",
+    "sass-embedded": "1.89.1",
     "vuepress": "2.0.0-rc.23"
   }
 }
