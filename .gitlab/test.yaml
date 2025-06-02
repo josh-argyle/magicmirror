@@ -53,7 +53,7 @@ test_electron_rebuild:
 snyk_amd64:
   stage: test
   image:
-    name: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_debug22
+    name: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_debug24
     entrypoint: [""]
   script:
     - cd /opt/magic_mirror
