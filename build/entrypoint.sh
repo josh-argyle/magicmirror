@@ -126,7 +126,7 @@ if [ "$STARTENV" = "test" ]; then
 
   cd ${base}
 
-  echo "/mount_ori/**/*" >> .prettierignore
+  rm -rf mount_ori/
   node --run test:prettier
   node --run test:js
   node --run test:css
