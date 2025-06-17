@@ -1,7 +1,3 @@
-include:
-  - project: "khassel/buildkit"
-    file: "/.buildkit.yml"
-
 build_labwc:
   stage: build
   extends:
@@ -11,10 +7,10 @@ build_labwc:
     DOCKERFILE_DIR: "./build/labwc"
     GIT_DEPTH: 1
     REGISTRY: "docker"
-    BUILDKIT_ARGS: "--opt platform=linux/amd64,linux/arm64,linux/arm/v7"
+    TARGETPLATFORM: "linux/amd64,linux/arm64,linux/arm/v7"
   script:
     - |
-      if [ "${CI_COMMIT_BRANCH}" = "master" ]; then
+      if [[ "${CI_COMMIT_BRANCH}" == "master" ]]; then
         export PUSH_IMAGES="karsten13/labwc:latest,karsten13/labwc:$(date '+%F')"
       else
         export PUSH_IMAGES="karsten13/labwc:${CI_COMMIT_BRANCH}"

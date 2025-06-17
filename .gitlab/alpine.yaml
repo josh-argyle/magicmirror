@@ -1,89 +1,45 @@
-.build_alpine:
+build_alpine:
   stage: build
+  needs:
+    - "bld_art: [amd64_min]"
+    - "bld_art: [arm64_min]"
+    - "bld_art: [arm_min]"
+  variables:
+    DOCKERFILE_NAME: "Dockerfile-alpine"
+    REGISTRY: "docker"
   script:
+    - !reference [.init, script]
     - |
       set -e
-      set | grep -E "BUILDER_IMG=|NODE_VERSION=|ADD_TAG="
-      if [ "$ADD_TAG" = "arm" ] && [ "$NODE_VERSION" != "22" ]; then
-        echo "skipping this build because there is no node version $NODE_VERSION for $ADD_TAG"
-        exit 0
+      echo "Building alpine image ..."
+      BUILDKIT_VARS="NODE_VERSION GIT_INFO CI_REGISTRY_IMAGE BUILDER_TAG"
+      if [[ "$NODE_VERSION" != "22" ]]; then
+        echo "skipping arm build because no node version $NODE_VERSION available for this architecture."
+        export TARGETPLATFORM="linux/amd64,linux/arm64"
+      else
+        export TARGETPLATFORM="linux/amd64,linux/arm64,linux/arm/v7"
       fi
-      dest="--destination ${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_alpine_${ADD_TAG}"
-      if [ "${CI_COMMIT_BRANCH}" = "master" ]; then
-        dest="${dest} --destination ${CI_REGISTRY_IMAGE}:alpine_${ADD_TAG}"
+      if [[ "${CI_COMMIT_BRANCH}" == "master" ]]; then
+        export PUSH_IMAGES="${DOCKER_USER}/magicmirror:${CI_COMMIT_BRANCH}_alpine,${DOCKER_USER}/magicmirror:alpine,${DOCKER_USER}/magicmirror:${MAGICMIRROR_VERSION}_alpine"
+      else
+        export PUSH_IMAGES="${DOCKER_USER}/magicmirror:${CI_COMMIT_BRANCH}_alpine"
       fi
-      build --context "./build" \
-        --dockerfile "Dockerfile-alpine" \
-        ${dest} \
-        --build-arg NODE_VERSION="${NODE_VERSION}" \
-        --build-arg GIT_INFO="${GIT_INFO}" \
-        --build-arg buildarch="${buildarch}" \
-        --build-arg BUILDER_IMG="${BUILDER_IMG}"
+      set | grep -E "NODE_VERSION=|CI_REGISTRY_IMAGE=|BUILDER_TAG="
+    - !reference [.docker_buildkit, script]
   extends:
-    - .beforescript
+    - .docker_buildkit
     - .rule
   environment:
     name: "$CI_COMMIT_BRANCH/Build Alpine"
 
-build_alpine_amd64:
-  variables:
-    imgkey: "amd64-on-dn"
-    ADD_TAG: "amd64"
-  needs:
-    - "bld_art: [amd64-on-dn]"
-  extends:
-    - .build_alpine
-
-build_alpine_arm:
-  variables:
-    imgkey: "arm-on-dn"
-    ADD_TAG: "arm"
-  needs:
-    - "bld_art: [arm-on-dn]"
-  extends:
-    - .build_alpine
-
-build_alpine_arm64:
-  variables:
-    imgkey: "arm64-on-dn"
-    ADD_TAG: "arm64"
-  needs:
-    - "bld_art: [arm64-on-dn]"
-  extends:
-    - .build_alpine
-
-sync_alpine:
-  needs:
-    - build_alpine_amd64
-    - build_alpine_arm
-    - build_alpine_arm64
-  image: ${TOOLBOX_IMG}
-  stage: build
-  script:
-    - |
-      set -e
-      docker.gitlab.login
-      if [ "${CI_COMMIT_BRANCH}" = "master" ]; then
-        docker.manifest "${CI_REGISTRY_IMAGE}:alpine" "alpine"
-        docker.manifest "${CI_REGISTRY_IMAGE}:alpine" "${MAGICMIRROR_VERSION}_alpine"
-        docker.sync "${CI_REGISTRY_IMAGE}:alpine ${CI_REGISTRY_IMAGE}:${MAGICMIRROR_VERSION}_alpine"
-      else
-        docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_alpine" "${CI_COMMIT_BRANCH}_alpine"
-        docker.sync "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_alpine"
-      fi
-  extends:
-    - .rule
-  environment:
-    name: "$CI_COMMIT_BRANCH/Docker Sync Alpine"
-    url: https://hub.docker.com/r/karsten13/magicmirror/tags
-
 test_alpine:
   stage: test
-  needs: ["build_alpine_amd64"]
+  needs:
+    - build_alpine
   variables:
     GIT_STRATEGY: none
   image:
-    name: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_alpine_amd64
+    name: ${DOCKER_USER}/magicmirror:${CI_COMMIT_BRANCH}_alpine
     entrypoint: [""]
   script:
     - |

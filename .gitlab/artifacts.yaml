@@ -1,16 +1,25 @@
-# imgkey=architecture-optionaldeps-devdeps
-# examples
-# amd64-on-dn for x86, no optionaldeps, no devdeps
-# arm-oy-dn for arm32, with  optionaldeps, no devdeps
-# arm64-oy-dn for arm64, with  optionaldeps, no devdeps
+# IMGKEY=architecture_{min|default|fat|debug}
+# Variants:
+# amd64_min: no opt, no dev
+# amd64_default: no opt, no dev
+# amd64_fat: incl. opt, no dev
+# amd64_debug: incl. opt and dev
+# arm_min: no opt, no dev (only used in alpine)
+# arm_default: incl. opt, no dev
+# arm_fat: incl. opt, no dev
+# arm64_min: no opt, no dev (only used in alpine)
+# arm64_fat: incl. opt, no dev
+# arm64_default: incl. opt, no dev
 
 check_artifacts:
   stage: build
-  image: ${TOOLBOX_IMG}
+  image:
+    name: alpine/crane:latest
+    entrypoint: [""]
   script:
     - |
       touch buildvars
-      for arch in "arm64-on-dn" "arm-on-dn" "arm64-oy-dn" "arm-oy-dn" "amd64-on-dn" "amd64-oy-dn" "amd64-oy-dy"; do
+      for arch in "arm64_min" "arm64_default" "arm64_fat" "arm_min" "arm_default" "arm_fat" "amd64_min" "amd64_default" "amd64_fat" "amd64_debug"; do
         img="${CI_REGISTRY_IMAGE}:${MAGICMIRROR_VERSION}_${arch}_artifacts"
         echo "checking $img ..."
         [ "$(crane config ${img} 2>/dev/null)" ] || echo "${arch}_" >> buildvars
@@ -26,36 +35,30 @@ check_artifacts:
 
 bld_art:
   stage: build
+  variables:
+    DOCKERFILE_NAME: "Dockerfile-artifacts"
   script:
+    - !reference [.init, script]
     - |
       set -e
       if [ "${CI_COMMIT_BRANCH}" = "master" ]; then
         cat buildvars
-        if [ "$(cat buildvars | grep ${imgkey}_)" != "${imgkey}_" ]; then
+        if [ "$(cat buildvars | grep ${IMGKEY}_)" != "${IMGKEY}_" ]; then
           echo "no builder image rebuild"
           exit 0
         fi
         echo "CI_COMMIT_BRANCH is master"
-        BuildRef="${MAGICMIRROR_VERSION}"
+        export BuildRef="${MAGICMIRROR_VERSION}"
       else
         echo "CI_COMMIT_BRANCH is not master"
-        BuildRef="develop"
+        export BuildRef="develop"
       fi
-      # clear imagearch to avoid using qemu:
-      export imgarch=""
-      set | grep -E "BUILDER_IMG=|NODE_VERSION=|buildarch=|BuildRef=|GITREPO_URL="
-      build --context "./build" \
-      --dockerfile "Dockerfile-artifacts" \
-      --destination "${BUILDER_IMG}" \
-      --build-arg NODE_VERSION="${NODE_VERSION}" \
-      --build-arg GIT_INFO="${GIT_INFO}" \
-      --build-arg buildarch="${buildarch}" \
-      --build-arg opt="${opt}" \
-      --build-arg dev="${dev}" \
-      --build-arg BuildRef="${BuildRef}" \
-      --build-arg GITREPO_URL="${GITREPO_URL}"
+      export PUSH_IMAGES="${CI_REGISTRY_IMAGE}:${BUILDER_TAG}_${IMGKEY}_artifacts"
+      set | grep -E "PUSH_IMAGES=|NODE_VERSION=|BuildRef=|GITREPO_URL="
+      export BUILDKIT_VARS="NODE_VERSION GIT_INFO IMGKEY BuildRef GITREPO_URL"
+    - !reference [.docker_buildkit, script]
   extends:
-    - .beforescript
+    - .docker_buildkit
   rules:
     - if: $TASK == "runtime" && $CI_COMMIT_BRANCH == "master"
       needs:
@@ -64,15 +67,18 @@ bld_art:
     - if: $TASK == "runtime"
   parallel:
     matrix:
-      - imgkey:
+      - IMGKEY:
           [
-            "arm64-on-dn",
-            "arm-on-dn",
-            "arm64-oy-dn",
-            "arm-oy-dn",
-            "amd64-on-dn",
-            "amd64-oy-dn",
-            "amd64-oy-dy",
+            "arm64_min",
+            "arm64_default",
+            "arm64_fat",
+            "arm_min",
+            "arm_default",
+            "arm_fat",
+            "amd64_min",
+            "amd64_default",
+            "amd64_fat",
+            "amd64_debug"
           ]
   environment:
-    name: "$CI_COMMIT_BRANCH/Build Artifacts $imgkey"
+    name: "$CI_COMMIT_BRANCH/Build Artifacts $IMGKEY"

@@ -1,59 +1,58 @@
 ARG NODE_VERSION
-FROM registry.gitlab.com/khassel/container/node-prune:latest as prune
-FROM node:${NODE_VERSION} as builder
+FROM registry.gitlab.com/khassel/buildkit/node-prune:latest AS prune
+FROM node:${NODE_VERSION} AS builder
+
+SHELL ["/bin/bash", "-c"]
 
 WORKDIR /opt/magic_mirror
 
 COPY --from=prune /node-prune /usr/local/bin/node-prune
 COPY build_info.sh /tmp
 
-RUN set -e; \
-    chmod +x /tmp/build_info.sh;
-
-ARG GIT_INFO
-ARG BuildRef
-ARG GITREPO_URL
-ARG buildarch
-ARG opt
-ARG dev
-RUN set -e; \
-    node -v; \
-    echo BuildRef="${BuildRef}"; \
-    echo GITREPO_URL="${GITREPO_URL}"; \
-    git clone --depth 1 -b "${BuildRef}" --single-branch "${GITREPO_URL}" .; \
-    git log -1; \
-    npmargs="--no-audit --no-fund --no-update-notifier"; \
-    if [ "${buildarch}" = "linux/arm/v7" ]; then \
-      npmargs="${npmargs} --arch=armv7l"; \
-    elif [ "${buildarch}" = "linux/arm64/v8" ]; then \
-      npmargs="${npmargs} --arch=arm64"; \
-    fi; \
-    if [ "${opt}" = "on" ]; then \
-      npmargs="${npmargs} --omit=optional"; \
-    fi; \
-    if [ "${dev}" = "dn" ]; then \
-      npmargs="${npmargs} --omit=dev"; \
-    fi; \
-    if [ ! $(echo "${BuildRef}" | grep -E "^v[0-9]+.[0-9]+.[0-9]+$") ]; then \
-      # if not mm-version then delete package-lock.json to get newest dependencies
-      rm -f package-lock.json; \
-    fi; \
-    echo "now executing: npm install ${npmargs}"; \
-    npm install ${npmargs}; \
-    echo "now uninstalling unwanted pm2"; \
-    npm uninstall pm2 ${npmargs}; \
-    cat package.json; \
-    sed -i "s:address\: \"localhost\":address\: \"0.0.0.0\":" config/config.js.sample; \
-    sed -i "s:ipWhitelist\: \[.*\],:ipWhitelist\: \[\],:" config/config.js.sample; \
-    mkdir mount_ori; \
-    mv modules mount_ori/; \
-    mv config mount_ori/; \
-    cp -r css mount_ori/; \
-    # remove not needed node_modules stuff
-    [ "${dev}" = "dn" ] && node-prune || echo "no node-prune"; \
-    cp /tmp/build_info.sh .; \
-    ./build_info.sh "Artifacts" "$GIT_INFO"; \
-    rm -f build_info.sh;
+ARG GIT_INFO BuildRef GITREPO_URL IMGKEY
+RUN <<EOF
+set -e
+node -v
+echo BuildRef="${BuildRef}"
+echo GITREPO_URL="${GITREPO_URL}"
+buildarch="$(echo $IMGKEY | sed 's|_.*||g')"
+echo buildarch="${buildarch}"
+git clone --depth 1 -b "${BuildRef}" --single-branch "${GITREPO_URL}" .
+git log -1
+npmargs="--no-audit --no-fund --no-update-notifier"
+if [[ "${buildarch}" == "arm" ]]; then \
+  npmargs="${npmargs} --arch=armv7l"
+elif [[ "${buildarch}" == "arm64" ]]; then \
+  npmargs="${npmargs} --arch=arm64"
+fi
+if [[ "${IMGKEY}" == "amd64_min" || "${IMGKEY}" == "amd64_default" ]]; then \
+  npmargs="${npmargs} --omit=optional"
+fi
+if [[ "${IMGKEY}" != "amd64_debug" ]]; then \
+  npmargs="${npmargs} --omit=dev"
+fi
+if [[ ! $(echo "${BuildRef}" | grep -E "^v[0-9]+.[0-9]+.[0-9]+$") ]]; then \
+  # if not mm-version then delete package-lock.json to get newest dependencies
+  rm -f package-lock.json
+fi
+echo "now executing: npm install ${npmargs}"
+npm install ${npmargs}
+echo "now uninstalling unwanted pm2"
+npm uninstall pm2 ${npmargs}
+cat package.json
+sed -i "s:address\: \"localhost\":address\: \"0.0.0.0\":" config/config.js.sample
+sed -i "s:ipWhitelist\: \[.*\],:ipWhitelist\: \[\],:" config/config.js.sample
+mkdir mount_ori
+mv modules mount_ori/
+mv config mount_ori/
+cp -r css mount_ori/
+# remove not needed node_modules stuff
+[[ "${IMGKEY}" != "amd64_debug" ]] && node-prune || echo "no node-prune"
+chmod +x /tmp/build_info.sh
+cp /tmp/build_info.sh .
+./build_info.sh "Artifacts" "$GIT_INFO"
+rm -f build_info.sh
+EOF
 
 FROM scratch
 LABEL maintainer="Karsten Hassel"

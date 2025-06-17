@@ -1,31 +1,35 @@
-ARG buildarch
-ARG BUILDER_IMG
+ARG CI_REGISTRY_IMAGE
+ARG BUILDER_TAG
 ARG NODE_VERSION
-FROM ${BUILDER_IMG} as builder
-FROM --platform=${buildarch} node:${NODE_VERSION}-alpine
+FROM ${CI_REGISTRY_IMAGE}:${BUILDER_TAG}_${TARGETARCH}_min_artifacts AS builder
+FROM node:${NODE_VERSION}-alpine
 LABEL maintainer="Karsten Hassel"
 
 USER root
 
-WORKDIR /opt/magic_mirror
+ENV MM_DIR=/opt/magic_mirror
+WORKDIR $MM_DIR
 
-COPY --from=builder --chmod=0777 --chown=node:node /opt/magic_mirror /opt/magic_mirror
+COPY --from=builder --chmod=0777 --chown=node:node $MM_DIR $MM_DIR
 # copy startscripts into container:
-COPY --chmod=0777 --chown=node:node *.sh /opt/magic_mirror/
+COPY --chmod=0777 --chown=node:node *.sh $MM_DIR/
 
 ARG GIT_INFO
-RUN set -e; \
-    apk add --no-cache git nano tzdata tini coreutils; \
-    echo "#!/bin/sh" > /usr/local/bin/sudo; \
-    echo 'exec "$@"' >> /usr/local/bin/sudo; \
-    touch /etc/localtime /etc/timezone; \
-    chmod u+rwx,g+rwx,o+rwx /etc; \
-    chmod u+rw,g+rw,o+rw /etc/localtime /etc/timezone; \
-    chmod +x *.sh /usr/local/bin/sudo; \
-    git config --system --add safe.directory /opt/magic_mirror; \
-    git config core.fileMode false; \
-    ./build_info.sh "Runtime" "$GIT_INFO"; \
-    rm -f build_info.sh;
+RUN <<EOF
+set -e
+chown node:node $MM_DIR
+apk add --no-cache git nano tzdata tini coreutils
+echo "#!/bin/sh" > /usr/local/bin/sudo
+echo 'exec "$@"' >> /usr/local/bin/sudo
+touch /etc/localtime /etc/timezone
+chmod u+rwx,g+rwx,o+rwx /etc
+chmod u+rw,g+rw,o+rw /etc/localtime /etc/timezone
+chmod +x *.sh /usr/local/bin/sudo
+git config --system --add safe.directory $MM_DIR
+git config core.fileMode false
+./build_info.sh "Runtime" "$GIT_INFO"
+rm -f build_info.sh
+EOF
 
 USER node
 

@@ -4,7 +4,7 @@
     GIT_STRATEGY: none
     STARTENV: test
   script:
-    - /opt/magic_mirror/entrypoint.sh
+    - $MM_DIR/entrypoint.sh
   extends:
     - .rulenomaster
   environment:
@@ -56,7 +56,7 @@ snyk_amd64:
     name: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_debug24
     entrypoint: [""]
   script:
-    - cd /opt/magic_mirror
+    - cd $MM_DIR
     - npm install snyk npm-check-updates
     - npx ncu --deep
     - npx ncu --deep --target minor
@@ -72,7 +72,7 @@ snyk_amd64:
 container_scanning:
   stage: test
   variables:
-    CS_IMAGE : karsten13/magicmirror:develop
+    CS_IMAGE: karsten13/magicmirror:develop
     CS_DOCKERFILE_PATH: build/Dockerfile-debian
     GIT_STRATEGY: fetch
   rules:

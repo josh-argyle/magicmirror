@@ -4,14 +4,15 @@ stages:
 
 include:
   - template: Security/Container-Scanning.gitlab-ci.yml
-  - project: "khassel/container"
-    file: "/.yaml/docker_readme.yaml"
+  - project: "khassel/buildkit"
+    file: "/.docker_readme.yml"
+  - project: "khassel/buildkit"
+    file: "/.buildkit.yml"
   - ".gitlab/*.yaml"
 
 default:
   tags:
     - saas-linux-medium-amd64
-  image: ${CI_REGISTRY}/khassel/container/kaniko:latest
 
 variables:
   GIT_DEPTH: 1
@@ -22,7 +23,6 @@ variables:
   DEBIAN_VERSION_DEVELOP: "bookworm"
   GITREPO_NAME: "MagicMirrorOrg/MagicMirror"
   GITREPO_URL: "https://github.com/${GITREPO_NAME}.git"
-  TOOLBOX_IMG: "${CI_REGISTRY}/khassel/container/toolbox:latest"
 
 .rule:
   rules:
@@ -32,43 +32,21 @@ variables:
   rules:
     - if: $TASK == "runtime" && $CI_COMMIT_BRANCH != "master"
 
-.beforescript:
-  before_script:
-    - docker.gitlab.login
+.init:
+  script:
     - |
       set -e
-      IFS=- read -r imgarch opt dev <<EOF
-      ${imgkey}
-      EOF
-      # needed for kaniko build script and qemu:
-      export imgarch
-      # needed for artifact builds:
-      export opt
-      export dev
-      # set build arch
-      export buildarch="linux/amd64"
-      if [ "${imgarch}" = "arm" ]; then
-        export buildarch="linux/arm/v7"
-      elif [ "${imgarch}" = "arm64" ]; then
-        export buildarch="linux/arm64/v8"
-      elif [ ! "${imgarch}" = "amd64" ]; then
-        echo "unsupported image arch: ${imgarch}"
-        exit 1
-      fi
       # master or not
-      if [ "${CI_COMMIT_BRANCH}" = "master" ]; then
-        BuilderTag=${MAGICMIRROR_VERSION}
-        [ -z "${NODE_VERSION}" ] && export NODE_VERSION=${NODE_VERSION_MASTER}
-        [ -z "${DEBIAN_VERSION}" ] && export DEBIAN_VERSION=${DEBIAN_VERSION_MASTER}
+      if [[ "${CI_COMMIT_BRANCH}" == "master" ]]; then
+        export BUILDER_TAG=${MAGICMIRROR_VERSION}
+        [[ -z "${NODE_VERSION}" ]] && export NODE_VERSION=${NODE_VERSION_MASTER}
+        [[ -z "${DEBIAN_VERSION}" ]] && export DEBIAN_VERSION=${DEBIAN_VERSION_MASTER}
       else
-        BuilderTag=${CI_COMMIT_BRANCH}
-        [ -z "${NODE_VERSION}" ] && export NODE_VERSION=${NODE_VERSION_DEVELOP}
-        [ -z "${DEBIAN_VERSION}" ] && export DEBIAN_VERSION=${DEBIAN_VERSION_DEVELOP}
+        export BUILDER_TAG=${CI_COMMIT_BRANCH}
+        [[ -z "${NODE_VERSION}" ]] && export NODE_VERSION=${NODE_VERSION_DEVELOP}
+        [[ -z "${DEBIAN_VERSION}" ]] && export DEBIAN_VERSION=${DEBIAN_VERSION_DEVELOP}
       fi
-      export BUILDER_IMG="${CI_REGISTRY_IMAGE}:${BuilderTag}_${imgkey}_artifacts"
       export GIT_INFO="commit=${CI_COMMIT_SHORT_SHA} ref=${CI_COMMIT_REF_NAME} date=${CI_COMMIT_TIMESTAMP} author=${CI_COMMIT_AUTHOR} title=${CI_COMMIT_TITLE}"
-  after_script:
-    - docker.logout
 
 pages:
   stage: build
@@ -97,9 +75,9 @@ sync_readme:
     - if: $TASK == "readme"
     - if: $CI_COMMIT_BRANCH == "master" && $TASK == "runtime"
       needs:
-        - sync_slim
-        - sync_fat
-        - sync_alpine
+        - build_debian_slim
+        - build_debian_fat
+        - build_alpine
   environment:
     name: "$CI_COMMIT_BRANCH/Docker Readme"
     url: https://hub.docker.com/r/karsten13/magicmirror
@@ -112,7 +90,7 @@ start_dev_build:
     entrypoint: [""]
   script:
     - |
-      cd /opt/magic_mirror
+      cd $MM_DIR
       current_sha="$(git log -1 --pretty=format:"%H")"
       curl -s --output repo.json https://api.github.com/repos/${GITREPO_NAME}/git/ref/heads/${DEV_BRANCH}
       remote_sha="$(cat repo.json | sed -rn 's|.*"sha": "([a-z,0-9]*).*|\1|p')"

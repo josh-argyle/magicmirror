@@ -1,175 +1,97 @@
 .runtimebuild:
-  stage: build
   script:
+    - !reference [.init, script]
     - |
       set -e
-      [ -z "${SLIM}" ] && export FAT="_fat"
-      [ "${dev}" == "dn" ] && export NODE_ENV="production" || export NODE_ENV="test"
-      set | grep -E "BUILDER_IMG=|NODE_VERSION=|buildarch=|FAT=|DEBIAN_VERSION=|ADD_TAG="
-      if [ "$ADD_TAG" = "arm" ] && [ "$NODE_VERSION" != "22" ]; then
-        echo "skipping this build because there is no node version $NODE_VERSION for $ADD_TAG"
-        exit 0
+      echo "Building debian image ..."
+      [[ "${FAT}" != "_fat" ]] && export SLIM="-slim"
+      [[ "${FAT}" == "_debug" ]] && export NODE_ENV="test" || export NODE_ENV="production"
+      BUILDKIT_VARS="NODE_VERSION GIT_INFO CI_REGISTRY_IMAGE BUILDER_TAG DEBIAN_VERSION SLIM CI_PROJECT_ID FAT NODE_ENV"
+      if [[ "${FAT}" == "_debug" ]]; then
+        export TARGETPLATFORM="linux/amd64"
+      elif [[ "$NODE_VERSION" != "22" ]]; then
+        echo "skipping arm build because no node version $NODE_VERSION available for this architecture."
+        export TARGETPLATFORM="linux/amd64,linux/arm64"
+      else
+        export TARGETPLATFORM="linux/amd64,linux/arm64,linux/arm/v7"
       fi
-      build --context "./build" \
-        --dockerfile "Dockerfile-debian" \
-        --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}${FAT}_${ADD_TAG}" \
-        --build-arg NODE_VERSION="${NODE_VERSION}" \
-        --build-arg DEBIAN_VERSION="${DEBIAN_VERSION}" \
-        --build-arg GIT_INFO="${GIT_INFO}" \
-        --build-arg buildarch="${buildarch}" \
-        --build-arg BUILDER_IMG="${BUILDER_IMG}" \
-        --build-arg SLIM="${SLIM}" \
-        --build-arg opt="${opt}" \
-        --build-arg CONTAINER_PCK_REG_TOKEN="${CONTAINER_PCK_REG_TOKEN}" \
-        --build-arg NODE_ENV="${NODE_ENV}"
-  extends:
-    - .beforescript
+      set | grep -E "NODE_VERSION=|CI_REGISTRY_IMAGE=|BUILDER_TAG=|FAT=|DEBIAN_VERSION="
 
-.runtime:
+build_debian_slim:
+  stage: build
+  variables:
+    DOCKERFILE_NAME: "Dockerfile-debian"
+    REGISTRY: "docker"
+    FAT: "_default"
+  needs:
+    - "bld_art: [amd64_default]"
+    - "bld_art: [arm64_default]"
+    - "bld_art: [arm_default]"
   extends:
-    - .runtimebuild
     - .rule
-
-build_amd64:
-  variables:
-    imgkey: "amd64-on-dn"
-    SLIM: "-slim"
-    ADD_TAG: "amd64"
-  needs: ["bld_art: [amd64-on-dn]"]
-  extends:
-    - .runtime
+    - .docker_buildkit
   environment:
-    name: "$CI_COMMIT_BRANCH/Build amd64"
+    name: "$CI_COMMIT_BRANCH/Build Debian slim"
+  script:
+    - !reference [.runtimebuild, script]
+    - |
+      if [[ "${CI_COMMIT_BRANCH}" == "master" ]]; then
+        export PUSH_IMAGES="${DOCKER_USER}/magicmirror:latest,${DOCKER_USER}/magicmirror:${MAGICMIRROR_VERSION}"
+      else
+        export PUSH_IMAGES="${DOCKER_USER}/magicmirror:${CI_COMMIT_BRANCH}"
+      fi
+    - !reference [.docker_buildkit, script]
 
-build_amd64_fat:
+build_debian_fat:
+  stage: build
   variables:
-    imgkey: "amd64-oy-dn"
-    ADD_TAG: "amd64"
-  needs: ["bld_art: [amd64-oy-dn]"]
+    DOCKERFILE_NAME: "Dockerfile-debian"
+    REGISTRY: "docker"
+    FAT: "_fat"
+  needs:
+    - "bld_art: [amd64_fat]"
+    - "bld_art: [arm64_fat]"
+    - "bld_art: [arm_fat]"
   extends:
-    - .runtime
+    - .rule
+    - .docker_buildkit
   environment:
-    name: "$CI_COMMIT_BRANCH/Build amd64 fat"
-
-build_arm:
-  variables:
-    imgkey: "arm-oy-dn"
-    SLIM: "-slim"
-    ADD_TAG: "arm"
-  needs: ["bld_art: [arm-oy-dn]"]
-  extends:
-    - .runtime
-  environment:
-    name: "$CI_COMMIT_BRANCH/Build arm"
-
-build_arm_fat:
-  variables:
-    imgkey: "arm-oy-dn"
-    ADD_TAG: "arm"
-  needs: ["bld_art: [arm-oy-dn]"]
-  extends:
-    - .runtime
-  environment:
-    name: "$CI_COMMIT_BRANCH/Build arm fat"
-
-build_arm64:
-  variables:
-    imgkey: "arm64-oy-dn"
-    SLIM: "-slim"
-    ADD_TAG: "arm64"
-  needs: ["bld_art: [arm64-oy-dn]"]
-  extends:
-    - .runtime
-  environment:
-    name: "$CI_COMMIT_BRANCH/Build arm64"
-
-build_arm64_fat:
-  variables:
-    imgkey: "arm64-oy-dn"
-    ADD_TAG: "arm64"
-  needs: ["bld_art: [arm64-oy-dn]"]
-  extends:
-    - .runtime
-  environment:
-    name: "$CI_COMMIT_BRANCH/Build arm64 fat"
+    name: "$CI_COMMIT_BRANCH/Build Debian fat"
+  script:
+    - !reference [.runtimebuild, script]
+    - |
+      if [[ "${CI_COMMIT_BRANCH}" == "master" ]]; then
+        export PUSH_IMAGES="${DOCKER_USER}/magicmirror:fat,${DOCKER_USER}/magicmirror:${MAGICMIRROR_VERSION}_fat"
+      else
+        export PUSH_IMAGES="${DOCKER_USER}/magicmirror:${CI_COMMIT_BRANCH}_fat"
+      fi
+    - !reference [.docker_buildkit, script]
 
 .build_debug:
+  stage: build
   variables:
-    SLIM: "-slim"
-    imgkey: "amd64-oy-dy"
-  needs: ["bld_art: [amd64-oy-dy]"]
+    DOCKERFILE_NAME: "Dockerfile-debian"
+    FAT: "_debug"
+    PUSH_IMAGES: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_debug${NODE_VERSION}"
+  needs:
+    - "bld_art: [amd64_debug]"
   extends:
-    - .runtimebuild
     - .rulenomaster
+    - .docker_buildkit
   environment:
     name: "$CI_COMMIT_BRANCH/Build Debug"
+  script:
+    - !reference [.runtimebuild, script]
+    - !reference [.docker_buildkit, script]
 
 build_debug22:
   variables:
-    ADD_TAG: "debug22"
     NODE_VERSION: "22"
   extends:
     - .build_debug
 
 build_debug24:
   variables:
-    ADD_TAG: "debug24"
     NODE_VERSION: "24"
   extends:
     - .build_debug
-
-sync_slim:
-  image: ${TOOLBOX_IMG}
-  needs:
-    - build_amd64
-    - build_arm64
-    - build_arm
-  stage: build
-  script:
-    - |
-      set -e
-      set | grep -E "CI_COMMIT_BRANCH=|CI_REGISTRY_IMAGE=|MAGICMIRROR_VERSION="
-      docker.gitlab.login
-      if [ "${CI_COMMIT_BRANCH}" = "master" ]; then
-        docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}" "latest"
-        docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}" "${MAGICMIRROR_VERSION}"
-        docker.sync "${CI_REGISTRY_IMAGE}:latest ${CI_REGISTRY_IMAGE}:${MAGICMIRROR_VERSION}"
-      else
-        docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}" "${CI_COMMIT_BRANCH}"
-        docker.sync "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}"
-      fi
-  after_script:
-    - docker.logout
-  extends:
-    - .rule
-  environment:
-    name: "$CI_COMMIT_BRANCH/Docker Sync Debian"
-    url: https://hub.docker.com/r/karsten13/magicmirror/tags
-
-sync_fat:
-  image: ${TOOLBOX_IMG}
-  needs:
-    - build_amd64_fat
-    - build_arm64_fat
-    - build_arm_fat
-  stage: build
-  script:
-    - |
-      set -e
-      set | grep -E "CI_COMMIT_BRANCH=|CI_REGISTRY_IMAGE=|MAGICMIRROR_VERSION="
-      docker.gitlab.login
-      if [ "${CI_COMMIT_BRANCH}" = "master" ]; then
-        docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_fat" "fat"
-        docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_fat" "${MAGICMIRROR_VERSION}_fat"
-        docker.sync "${CI_REGISTRY_IMAGE}:fat ${CI_REGISTRY_IMAGE}:${MAGICMIRROR_VERSION}_fat"
-      else
-        docker.manifest "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_fat" "${CI_COMMIT_BRANCH}_fat"
-        docker.sync "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_fat"
-      fi
-  after_script:
-    - docker.logout
-  extends:
-    - .rule
-  environment:
-    name: "$CI_COMMIT_BRANCH/Docker Sync Debian Fat"
-    url: https://hub.docker.com/r/karsten13/magicmirror/tags

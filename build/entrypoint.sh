@@ -1,13 +1,11 @@
 #!/bin/sh
 
-base="/opt/magic_mirror"
-
-modules_dir="${base}/modules"
+modules_dir="${MM_DIR}/modules"
 default_dir="${modules_dir}/default"
-config_dir="${base}/config"
-css_dir="${base}/css"
+config_dir="${MM_DIR}/config"
+css_dir="${MM_DIR}/css"
 
-mounted="$(mount | sed -rn 's|.*on\s*'$base'([^ ]*).*|'$base'\1|p' | xargs)"
+mounted="$(mount | sed -rn 's|.*on\s*'$MM_DIR'([^ ]*).*|'$MM_DIR'\1|p' | xargs)"
 [ -z "${mounted}" ] && mounted="$modules_dir $config_dir $css_dir"
 
 _info() {
@@ -75,7 +73,7 @@ if [ "${MM_OVERRIDE_DEFAULT_MODULES}" = "true" ]; then
     _info "copy default modules"
     rm -rf ${default_dir}
     mkdir -p ${default_dir}
-    cp -r ${base}/mount_ori/modules/default/. ${default_dir}/
+    cp -r ${MM_DIR}/mount_ori/modules/default/. ${default_dir}/
   else
     _error "No write permission for ${default_dir}, skipping copying default modules"
   fi
@@ -86,7 +84,7 @@ fi
 if [ "${MM_OVERRIDE_CSS}" = "true" ]; then
   if [ -w "${css_dir}" ]; then
     _info "copy css files"
-    cp ${base}/mount_ori/css/* ${css_dir}/
+    cp ${MM_DIR}/mount_ori/css/* ${css_dir}/
   else
     _error "No write permission for ${css_dir}, skipping copying css files"
   fi
@@ -99,7 +97,7 @@ if [ ! -f "${config_dir}/config.js" ]; then
   mkdir -p ${config_dir}
   if [ -w "${config_dir}" ]; then
     _info "copy default config.js"
-    cp ${base}/mount_ori/config/config.js.sample ${config_dir}/config.js
+    cp ${MM_DIR}/mount_ori/config/config.js.sample ${config_dir}/config.js
   else
     _error "No write permission for ${config_dir}, skipping copying config.js"
   fi
@@ -107,10 +105,10 @@ fi
 
 if [ "$MM_SHOW_CURSOR" = "true" ]; then
   _info "enable mouse cursor"
-  sed -i "s|  cursor: .*;|  cursor: auto;|" ${base}/css/main.css
+  sed -i "s|  cursor: .*;|  cursor: auto;|" ${MM_DIR}/css/main.css
 fi
 
-[ -z "$MM_RESTORE_SCRIPT_CONFIG" ] || (${base}/create_restore_script.sh "$MM_RESTORE_SCRIPT_CONFIG" || true)
+[ -z "$MM_RESTORE_SCRIPT_CONFIG" ] || (${MM_DIR}/create_restore_script.sh "$MM_RESTORE_SCRIPT_CONFIG" || true)
 
 if [ "$STARTENV" = "test" ]; then
   set -e
@@ -124,7 +122,7 @@ if [ "$STARTENV" = "test" ]; then
   WLR_BACKENDS=headless WLR_LIBINPUT_NO_DEVICES=1 WLR_RENDERER=pixman labwc &
   export WAYLAND_DISPLAY=wayland-0
 
-  cd ${base}
+  cd ${MM_DIR}
 
   rm -rf mount_ori/
   node --run test:prettier
@@ -137,9 +135,9 @@ if [ "$STARTENV" = "test" ]; then
 else
   _script=""
   if [ -f "start_script.sh" ]; then
-    _script="${base}/start_script.sh"
+    _script="${MM_DIR}/start_script.sh"
   elif [ -f "config/start_script.sh" ]; then
-    _script="${base}/config/start_script.sh"
+    _script="${MM_DIR}/config/start_script.sh"
   elif [ -f "/config/start_script.sh" ]; then
     _script="/config/start_script.sh"
   fi
