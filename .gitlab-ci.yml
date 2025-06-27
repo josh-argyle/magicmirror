@@ -6,8 +6,6 @@ include:
   - template: Security/Container-Scanning.gitlab-ci.yml
   - project: "khassel/buildkit"
     file: "/.docker_readme.yml"
-  - project: "khassel/buildkit"
-    file: "/.buildkit.yml"
   - ".gitlab/*.yaml"
 
 default:

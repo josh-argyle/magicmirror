@@ -6,7 +6,7 @@
       echo "Building debian image ..."
       [[ "${FAT}" != "_fat" ]] && export SLIM="-slim"
       [[ "${FAT}" == "_debug" ]] && export NODE_ENV="test" || export NODE_ENV="production"
-      BUILDKIT_VARS="NODE_VERSION GIT_INFO CI_REGISTRY_IMAGE BUILDER_TAG DEBIAN_VERSION SLIM CI_PROJECT_ID FAT NODE_ENV"
+      export BUILDKIT_VARS="NODE_VERSION GIT_INFO CI_REGISTRY_IMAGE BUILDER_TAG DEBIAN_VERSION SLIM CI_PROJECT_ID FAT NODE_ENV"
       if [[ "${FAT}" == "_debug" ]]; then
         export TARGETPLATFORM="linux/amd64"
       elif [[ "$NODE_VERSION" != "22" ]]; then
@@ -19,9 +19,9 @@
 
 build_debian_slim:
   stage: build
+  image: ${CI_REGISTRY}/khassel/buildkit:latest
   variables:
-    DOCKERFILE_NAME: "Dockerfile-debian"
-    REGISTRY: "docker"
+    CNTNR_FILE_NAME: "Dockerfile-debian"
     FAT: "_default"
   needs:
     - "bld_art: [amd64_default]"
@@ -29,7 +29,6 @@ build_debian_slim:
     - "bld_art: [arm_default]"
   extends:
     - .rule
-    - .docker_buildkit
   environment:
     name: "$CI_COMMIT_BRANCH/Build Debian slim"
   script:
@@ -40,13 +39,13 @@ build_debian_slim:
       else
         export PUSH_IMAGES="${DOCKER_USER}/magicmirror:${CI_COMMIT_BRANCH}"
       fi
-    - !reference [.docker_buildkit, script]
+      build
 
 build_debian_fat:
   stage: build
+  image: ${CI_REGISTRY}/khassel/buildkit:latest
   variables:
-    DOCKERFILE_NAME: "Dockerfile-debian"
-    REGISTRY: "docker"
+    CNTNR_FILE_NAME: "Dockerfile-debian"
     FAT: "_fat"
   needs:
     - "bld_art: [amd64_fat]"
@@ -54,7 +53,6 @@ build_debian_fat:
     - "bld_art: [arm_fat]"
   extends:
     - .rule
-    - .docker_buildkit
   environment:
     name: "$CI_COMMIT_BRANCH/Build Debian fat"
   script:
@@ -65,24 +63,24 @@ build_debian_fat:
       else
         export PUSH_IMAGES="${DOCKER_USER}/magicmirror:${CI_COMMIT_BRANCH}_fat"
       fi
-    - !reference [.docker_buildkit, script]
+      build
 
 .build_debug:
   stage: build
+  image: ${CI_REGISTRY}/khassel/buildkit:latest
   variables:
-    DOCKERFILE_NAME: "Dockerfile-debian"
+    CNTNR_FILE_NAME: "Dockerfile-debian"
     FAT: "_debug"
     PUSH_IMAGES: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_debug${NODE_VERSION}"
   needs:
     - "bld_art: [amd64_debug]"
   extends:
     - .rulenomaster
-    - .docker_buildkit
   environment:
     name: "$CI_COMMIT_BRANCH/Build Debug"
   script:
     - !reference [.runtimebuild, script]
-    - !reference [.docker_buildkit, script]
+    - build
 
 build_debug22:
   variables:

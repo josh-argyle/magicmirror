@@ -4,15 +4,15 @@ build_alpine:
     - "bld_art: [amd64_min]"
     - "bld_art: [arm64_min]"
     - "bld_art: [arm_min]"
+  image: ${CI_REGISTRY}/khassel/buildkit:latest
   variables:
-    DOCKERFILE_NAME: "Dockerfile-alpine"
-    REGISTRY: "docker"
+    CNTNR_FILE_NAME: "Dockerfile-alpine"
   script:
     - !reference [.init, script]
     - |
       set -e
       echo "Building alpine image ..."
-      BUILDKIT_VARS="NODE_VERSION GIT_INFO CI_REGISTRY_IMAGE BUILDER_TAG"
+      export BUILDKIT_VARS="NODE_VERSION GIT_INFO CI_REGISTRY_IMAGE BUILDER_TAG"
       if [[ "$NODE_VERSION" != "22" ]]; then
         echo "skipping arm build because no node version $NODE_VERSION available for this architecture."
         export TARGETPLATFORM="linux/amd64,linux/arm64"
@@ -25,9 +25,8 @@ build_alpine:
         export PUSH_IMAGES="${DOCKER_USER}/magicmirror:${CI_COMMIT_BRANCH}_alpine"
       fi
       set | grep -E "NODE_VERSION=|CI_REGISTRY_IMAGE=|BUILDER_TAG="
-    - !reference [.docker_buildkit, script]
+      build
   extends:
-    - .docker_buildkit
     - .rule
   environment:
     name: "$CI_COMMIT_BRANCH/Build Alpine"

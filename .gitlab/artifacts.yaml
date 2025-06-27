@@ -35,8 +35,9 @@ check_artifacts:
 
 bld_art:
   stage: build
+  image: ${CI_REGISTRY}/khassel/buildkit:latest
   variables:
-    DOCKERFILE_NAME: "Dockerfile-artifacts"
+    CNTNR_FILE_NAME: "Dockerfile-artifacts"
   script:
     - !reference [.init, script]
     - |
@@ -54,11 +55,9 @@ bld_art:
         export BuildRef="develop"
       fi
       export PUSH_IMAGES="${CI_REGISTRY_IMAGE}:${BUILDER_TAG}_${IMGKEY}_artifacts"
-      set | grep -E "PUSH_IMAGES=|NODE_VERSION=|BuildRef=|GITREPO_URL="
+      set | grep -E "NODE_VERSION=|BuildRef=|GITREPO_URL="
       export BUILDKIT_VARS="NODE_VERSION GIT_INFO IMGKEY BuildRef GITREPO_URL"
-    - !reference [.docker_buildkit, script]
-  extends:
-    - .docker_buildkit
+      build
   rules:
     - if: $TASK == "runtime" && $CI_COMMIT_BRANCH == "master"
       needs:

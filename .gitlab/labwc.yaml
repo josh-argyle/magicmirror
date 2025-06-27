@@ -1,12 +1,10 @@
 build_labwc:
   stage: build
-  extends:
-    - .docker_buildkit
+  image: ${CI_REGISTRY}/khassel/buildkit:latest
   variables:
-    DOCKER_CONTEXT: "./build/labwc"
-    DOCKERFILE_DIR: "./build/labwc"
+    CNTNR_CONTEXT: "./build/labwc"
+    CNTNR_FILE_DIR: "./build/labwc"
     GIT_DEPTH: 1
-    REGISTRY: "docker"
     TARGETPLATFORM: "linux/amd64,linux/arm64,linux/arm/v7"
   script:
     - |
@@ -15,6 +13,6 @@ build_labwc:
       else
         export PUSH_IMAGES="karsten13/labwc:${CI_COMMIT_BRANCH}"
       fi
-    - !reference [.docker_buildkit, script]
+      build
   rules:
     - if: $TASK == "build_labwc"
