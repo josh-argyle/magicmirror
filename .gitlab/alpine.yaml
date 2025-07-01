@@ -20,7 +20,7 @@ build_alpine:
         export TARGETPLATFORM="linux/amd64,linux/arm64,linux/arm/v7"
       fi
       if [[ "${CI_COMMIT_BRANCH}" == "master" ]]; then
-        export PUSH_IMAGES="${DOCKER_USER}/magicmirror:${CI_COMMIT_BRANCH}_alpine,${DOCKER_USER}/magicmirror:alpine,${DOCKER_USER}/magicmirror:${MAGICMIRROR_VERSION}_alpine"
+        export PUSH_IMAGES="${DOCKER_USER}/magicmirror:alpine,${DOCKER_USER}/magicmirror:${MAGICMIRROR_VERSION}_alpine"
       else
         export PUSH_IMAGES="${DOCKER_USER}/magicmirror:${CI_COMMIT_BRANCH}_alpine"
       fi
