@@ -35,9 +35,9 @@ build_debian_slim:
     - !reference [.runtimebuild, script]
     - |
       if [[ "${CI_COMMIT_BRANCH}" == "master" ]]; then
-        export PUSH_IMAGES="${DOCKER_USER}/magicmirror:latest,${DOCKER_USER}/magicmirror:${MAGICMIRROR_VERSION}"
+        export PUSH_IMAGES="${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH},${DOCKER_USER}/magicmirror:latest,${DOCKER_USER}/magicmirror:${MAGICMIRROR_VERSION}"
       else
-        export PUSH_IMAGES="${DOCKER_USER}/magicmirror:${CI_COMMIT_BRANCH}"
+        export PUSH_IMAGES="${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH},${DOCKER_USER}/magicmirror:${CI_COMMIT_BRANCH}"
       fi
       build
 
