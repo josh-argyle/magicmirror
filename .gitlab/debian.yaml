@@ -9,11 +9,11 @@
       export BUILDKIT_VARS="NODE_VERSION GIT_INFO CI_REGISTRY_IMAGE BUILDER_TAG DEBIAN_VERSION SLIM CI_PROJECT_ID FAT NODE_ENV"
       if [[ "${FAT}" == "_debug" ]]; then
         export TARGETPLATFORM="linux/amd64"
-      elif [[ "$NODE_VERSION" != "22" ]]; then
-        echo "skipping arm build because no node version $NODE_VERSION available for this architecture."
-        export TARGETPLATFORM="linux/amd64,linux/arm64"
       else
         export TARGETPLATFORM="linux/amd64,linux/arm64,linux/arm/v7"
+        if [[ "$NODE_VERSION" != "22" ]]; then
+          echo "using node version 22 for arm build because no node version $NODE_VERSION available for this architecture."
+        fi
       fi
       set | grep -E "NODE_VERSION=|CI_REGISTRY_IMAGE=|BUILDER_TAG=|FAT=|DEBIAN_VERSION="
 

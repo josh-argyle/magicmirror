@@ -7,6 +7,7 @@ build_alpine:
   image: ${CI_REGISTRY}/khassel/buildkit:latest
   variables:
     CNTNR_FILE_NAME: "Dockerfile-alpine"
+    TARGETPLATFORM: "linux/amd64,linux/arm64,linux/arm/v7"
   script:
     - !reference [.init, script]
     - |
@@ -14,10 +15,7 @@ build_alpine:
       echo "Building alpine image ..."
       export BUILDKIT_VARS="NODE_VERSION GIT_INFO CI_REGISTRY_IMAGE BUILDER_TAG"
       if [[ "$NODE_VERSION" != "22" ]]; then
-        echo "skipping arm build because no node version $NODE_VERSION available for this architecture."
-        export TARGETPLATFORM="linux/amd64,linux/arm64"
-      else
-        export TARGETPLATFORM="linux/amd64,linux/arm64,linux/arm/v7"
+        echo "using node version 22 for arm build because no node version $NODE_VERSION available for this architecture."
       fi
       if [[ "${CI_COMMIT_BRANCH}" == "master" ]]; then
         export PUSH_IMAGES="${CI_REGISTRY_IMAGE}:${CI_COMMIT_BRANCH}_alpine,${DOCKER_USER}/magicmirror:alpine,${DOCKER_USER}/magicmirror:${MAGICMIRROR_VERSION}_alpine"
