@@ -4,8 +4,6 @@ stages:
 
 include:
   - template: Security/Container-Scanning.gitlab-ci.yml
-  - project: "khassel/buildkit"
-    file: "/.docker_readme.yml"
   - ".gitlab/*.yaml"
 
 default:
@@ -68,7 +66,9 @@ pages:
 
 sync_readme:
   stage: build
-  extends: .docker_readme
+  image: ${CI_REGISTRY}/khassel/buildkit/readme:latest
+  script:
+    - readme
   rules:
     - if: $TASK == "readme"
     - if: $CI_COMMIT_BRANCH == "master" && $TASK == "runtime"
