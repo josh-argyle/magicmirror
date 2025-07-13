@@ -35,7 +35,7 @@ check_artifacts:
 
 bld_art:
   stage: build
-  image: ${CI_REGISTRY}/khassel/buildkit:latest
+  image: ${CI_REGISTRY}/khassel/buildkit:rootless
   variables:
     CNTNR_FILE_NAME: "Dockerfile-artifacts"
   script:

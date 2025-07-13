@@ -19,7 +19,7 @@
 
 build_debian_slim:
   stage: build
-  image: ${CI_REGISTRY}/khassel/buildkit:latest
+  image: ${CI_REGISTRY}/khassel/buildkit:rootless
   variables:
     CNTNR_FILE_NAME: "Dockerfile-debian"
     FAT: "_default"
@@ -43,7 +43,7 @@ build_debian_slim:
 
 build_debian_fat:
   stage: build
-  image: ${CI_REGISTRY}/khassel/buildkit:latest
+  image: ${CI_REGISTRY}/khassel/buildkit:rootless
   variables:
     CNTNR_FILE_NAME: "Dockerfile-debian"
     FAT: "_fat"
@@ -67,7 +67,7 @@ build_debian_fat:
 
 .build_debug:
   stage: build
-  image: ${CI_REGISTRY}/khassel/buildkit:latest
+  image: ${CI_REGISTRY}/khassel/buildkit:rootless
   variables:
     CNTNR_FILE_NAME: "Dockerfile-debian"
     FAT: "_debug"

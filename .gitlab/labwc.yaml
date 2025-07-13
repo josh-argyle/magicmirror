@@ -1,6 +1,6 @@
 build_labwc:
   stage: build
-  image: ${CI_REGISTRY}/khassel/buildkit:latest
+  image: ${CI_REGISTRY}/khassel/buildkit:rootless
   variables:
     CNTNR_CONTEXT: "./build/labwc"
     CNTNR_FILE_DIR: "./build/labwc"
