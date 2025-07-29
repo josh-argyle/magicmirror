@@ -66,7 +66,7 @@ pages:
 
 sync_readme:
   stage: build
-  image: ${CI_REGISTRY}/khassel/buildkit/readme:latest
+  image: ${CI_REGISTRY}/khassel/buildkit:rootless
   script:
     - readme
   rules:
