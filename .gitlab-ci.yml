@@ -53,7 +53,7 @@ pages:
       cd pages
       chmod +x replacevars
       npm i
-      npm run build:ci
+      node --run build:ci
   artifacts:
     paths:
       - public
