@@ -5,15 +5,12 @@ services:
       - ${VOLUME_CONFIG}
       - ${VOLUME_MODULES}
       - ${VOLUME_CSS}
-  base_env:
     environment:
       - MM_OVERRIDE_DEFAULT_MODULES
       - MM_SHOW_CURSOR
       - MM_SCENARIO
       - MM_MODULES_DIR
       - MM_CUSTOMCSS_FILE
-    extends:
-      service: base
   gui:
     image: ${MM_IMAGE}
     volumes:
@@ -50,7 +47,7 @@ services:
     ports:
       - ${MM_SERVER_PORTS}
     extends:
-      service: base_env
+      service: base
   # electron
   electron:
     extends:

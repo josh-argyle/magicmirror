@@ -5,9 +5,6 @@ default_dir="${modules_dir}/default"
 config_dir="${MM_DIR}/config"
 css_dir="${MM_DIR}/css"
 
-mounted="$(mount | sed -rn 's|.*on\s*'$MM_DIR'([^ ]*).*|'$MM_DIR'\1|p' | xargs)"
-[ -z "${mounted}" ] && mounted="$modules_dir $config_dir $css_dir"
-
 _info() {
   echo "[entrypoint $(date +%T.%3N)] [INFO]   $1"
 }
@@ -20,8 +17,7 @@ _start_mm() {
   if [ "$(id -u)" = "0" ]; then
     _info "running as root but starting the magicmirror process with uid=1000"
     # directories must be writable by user node:
-    chown -R node:node ${mounted}
-    chown node:node ${modules_dir}
+    chown -R node:node $modules_dir $config_dir $css_dir
     _file="mm.env"
     rm -f $_file
     echo "export START_CMD=\"$@\"" > $_file
@@ -35,15 +31,6 @@ _start_mm() {
     exec "$@"
   fi
 }
-
-if [ "$STARTENV" = "init" ]; then
-  _info "change permissions for folders ${mounted} ..."
-  chown -R ${MM_UID}:${MM_GID} ${mounted}
-  chmod -R ${MM_CHMOD} ${mounted}
-  _info "done."
-
-  exit 0
-fi
 
 if [ -z "$TZ" ]; then
   export TZ="$(wget -qO - http://geoip.ubuntu.com/lookup | sed -n -e 's/.*<TimeZone>\(.*\)<\/TimeZone>.*/\1/p')"
