@@ -149,7 +149,7 @@ else
         if [ -S $XDG_RUNTIME_DIR/wayland-0 ]; then
           _start_mm node --run start:wayland
         else
-          _start_mm npm start
+          _start_mm node --run start
         fi
       else
         _start_mm node --run server
@@ -160,7 +160,7 @@ else
         if [ -S $XDG_RUNTIME_DIR/wayland-0 ]; then
           _start_mm node --run start:wayland
         else
-          _start_mm npm start
+          _start_mm node --run start
         fi
       else
         _start_mm node --run server
