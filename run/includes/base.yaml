@@ -1,16 +1,4 @@
 services:
-  base:
-    image: ${MM_IMAGE}
-    volumes:
-      - ${VOLUME_CONFIG}
-      - ${VOLUME_MODULES}
-      - ${VOLUME_CSS}
-    environment:
-      - MM_OVERRIDE_DEFAULT_MODULES
-      - MM_SHOW_CURSOR
-      - MM_SCENARIO
-      - MM_MODULES_DIR
-      - MM_CUSTOMCSS_FILE
   gui:
     image: ${MM_IMAGE}
     volumes:
@@ -29,7 +17,23 @@ services:
       - WAYLAND_DISPLAY=wayland-0
       - XDG_RUNTIME_DIR=${LAB_WC_SOCK_DIR}
     shm_size: "256mb"
-  base_electron:
+  # server
+  server:
+    image: ${MM_IMAGE}
+    volumes:
+      - ${VOLUME_CONFIG}
+      - ${VOLUME_MODULES}
+      - ${VOLUME_CSS}
+    environment:
+      - MM_OVERRIDE_DEFAULT_MODULES
+      - MM_SHOW_CURSOR
+      - MM_SCENARIO
+      - MM_MODULES_DIR
+      - MM_CUSTOMCSS_FILE
+    ports:
+      - ${MM_SERVER_PORTS}
+  # electron
+  electron:
     volumes:
       - ${VOLUME_CONFIG}
       - ${VOLUME_MODULES}
@@ -42,18 +46,6 @@ services:
       - MM_CUSTOMCSS_FILE
     extends:
       service: gui
-  # server
-  server:
-    ports:
-      - ${MM_SERVER_PORTS}
-    extends:
-      service: base
-  # electron
-  electron:
-    extends:
-      service: base_electron
-    devices:
-      - /dev/vchiq
     network_mode: host
   # client
   client:
