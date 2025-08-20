@@ -4,7 +4,6 @@ build_alpine:
     - "bld_art: [amd64_min]"
     - "bld_art: [arm64_min]"
     - "bld_art: [arm_min]"
-  image: ${CI_REGISTRY}/khassel/buildkit:rootless
   variables:
     CNTNR_FILE_NAME: "Dockerfile-alpine"
     TARGETPLATFORM: "linux/amd64,linux/arm64,linux/arm/v7"

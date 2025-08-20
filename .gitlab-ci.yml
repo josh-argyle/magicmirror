@@ -7,6 +7,7 @@ include:
   - ".gitlab/*.yaml"
 
 default:
+  image: ${BUILDKIT_IMG}:rootless
   tags:
     - saas-linux-medium-amd64
 
@@ -66,7 +67,6 @@ pages:
 
 sync_readme:
   stage: build
-  image: ${CI_REGISTRY}/khassel/buildkit:rootless
   script:
     - readme
   rules:

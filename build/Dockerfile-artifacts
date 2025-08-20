@@ -1,5 +1,5 @@
-ARG NODE_VERSION
-FROM registry.gitlab.com/khassel/buildkit/node-prune:latest AS prune
+ARG NODE_VERSION BUILDKIT_IMG
+FROM ${BUILDKIT_IMG}/node-prune:latest AS prune
 FROM node:${NODE_VERSION} AS builder
 
 SHELL ["/bin/bash", "-c"]
