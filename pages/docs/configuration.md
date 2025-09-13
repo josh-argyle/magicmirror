@@ -26,7 +26,7 @@ You can also use the `.env` file (in the same directory as your `compose.yaml`) 
 
 For installing modules refer to the module website, the default modules are described [here](https://docs.magicmirror.builders/modules/introduction.html).
 
-> There is one difference installing or updating modules compared to a standard setup: You must do the `git clone ...`, `git pull` and `npm install` commands from inside the running docker container. For this you execute `docker exec -it mm bash` and in this shell you navigate to the `modules/MMM-...` folder. For exiting from the container you type `exit`.
+> There is one difference installing or updating modules compared to a standard setup: You must do the `git clone ...`, `git pull` and `npm install` commands from inside the running container. For this you execute `docker exec -it mm bash` and in this shell you navigate to the `modules/MMM-...` folder. For exiting from the container you type `exit`.
 
 `css` contains the `custom.css` file, which you can use to override your
 modules' appearance. CSS basics are documented
@@ -34,7 +34,7 @@ modules' appearance. CSS basics are documented
 
 ## Default Modules
 
-The default modules of MagicMirror² are located in the folder `~/magicmirror/mounts/modules`. These modules are maintained in the MagicMirror² project and not - as other modules - in own git repositories. So if they are mounted the first time outside the container this version remains on the host and would never updated again. To prevent this, the docker container overrides the `default` modules folder with the versions from inside the container.
+The default modules of MagicMirror² are located in the folder `~/magicmirror/mounts/modules`. These modules are maintained in the MagicMirror² project and not - as other modules - in own git repositories. So if they are mounted the first time outside the container this version remains on the host and would never updated again. To prevent this, the container overrides the `default` modules folder with the versions from inside the container.
 
 If someone does not agree with this procedure he can avoid the copy process by setting the environment variable `MM_OVERRIDE_DEFAULT_MODULES` to `false` in the `.env` file:
 ```bash

@@ -9,11 +9,12 @@
   },
   "keywords": [
     "MagicMirror²",
-    "Docker"
+    "Docker",
+    "Container"
   ],
   "author": "Karsten Hassel",
   "license": "MIT",
-  "description": "Documentation for MagicMirror² Docker Setup",
+  "description": "Documentation for MagicMirror² Container Setup",
   "devDependencies": {
     "@vuepress/bundler-vite": "2.0.0-rc.24",
     "@vuepress/theme-default": "2.0.0-rc.112",

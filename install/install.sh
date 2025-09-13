@@ -64,7 +64,7 @@ cd "$base/run"
 
 [[ -f "compose.yaml" ]] || cp original.compose.yaml compose.yaml
 if [[ ! -f ".env" ]]; then
-  _info "--> Magicmirror docker setup for scenario $scenario"
+  _info "--> Magicmirror container setup for scenario $scenario"
 
   echo "creating .env file"
 
@@ -95,7 +95,7 @@ if [[ ! -f ".env" ]]; then
   fi
 fi
 
-_info "--> Pulling docker images and starting magicmirror"
+_info "--> Pulling container images and starting magicmirror"
 # need sudo for docker here if docker was installed with this script
 
 # use up so mm can start if there are already local images

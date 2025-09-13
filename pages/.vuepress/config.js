@@ -3,7 +3,7 @@ import { defaultTheme } from "@vuepress/theme-default";
 import { defineUserConfig } from "vuepress";
 
 export default defineUserConfig({
-  title: "MagicMirror² Docker Setup",
+  title: "MagicMirror² Container Setup",
   base: "/magicmirror/",
   bundler: viteBundler(),
   theme: defaultTheme({
@@ -15,7 +15,7 @@ export default defineUserConfig({
     editLink: false,
     sidebar: [
       {
-        text: "Docker setup",
+        text: "Container Setup",
         collapsible: true,
         children: [
           "/",

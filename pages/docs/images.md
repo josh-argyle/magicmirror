@@ -1,5 +1,5 @@
 ---
-title: Docker Images
+title: Container Images
 ---
 
 > ⚠️ Changes in Aug. 2024 (see [installation](/magicmirror/docs/installation.html#init-container-and-running-as-root))
@@ -8,15 +8,15 @@ title: Docker Images
 
 # Images on [Docker Hub](https://hub.docker.com/r/karsten13/magicmirror/):  [![](https://img.shields.io/docker/pulls/karsten13/magicmirror.svg)](https://hub.docker.com/r/karsten13/magicmirror/)
 
-The docker image `karsten13/magicmirror` is available with these tags:
+The container image `karsten13/magicmirror` is available with these tags:
 
 TAG                                             | OS/ARCH     | ELECTRON | DISTRO                                  | DESCRIPTION
 ----------------------------------------------- | ----------- | -------- | ----------------------------------------|------------------------------------------
 **latest** (or {{ MAGICMIRROR_VERSION }})       | linux/amd64 | no       | debian {{ DEBIAN_VERSION_MASTER }} slim | for x86, only `serveronly`-mode
-**latest** (or {{ MAGICMIRROR_VERSION }})       | linux/arm   | yes      | debian {{ DEBIAN_VERSION_MASTER }} slim | for raspberry pi 32-Bit os
+**latest** (or {{ MAGICMIRROR_VERSION }})       | linux/arm   | yes      | debian bookworm slim                    | for raspberry pi 32-Bit os
 **latest** (or {{ MAGICMIRROR_VERSION }})       | linux/arm64 | yes      | debian {{ DEBIAN_VERSION_MASTER }} slim | for raspberry pi 64-Bit os
 **fat** (or {{ MAGICMIRROR_VERSION }}_fat)      | linux/amd64 | yes      | debian {{ DEBIAN_VERSION_MASTER }}      | for x86
-**fat** (or {{ MAGICMIRROR_VERSION }}_fat)      | linux/arm   | yes      | debian {{ DEBIAN_VERSION_MASTER }}      | for raspberry pi 32-Bit os
+**fat** (or {{ MAGICMIRROR_VERSION }}_fat)      | linux/arm   | yes      | debian bookworm                         | for raspberry pi 32-Bit os
 **fat** (or {{ MAGICMIRROR_VERSION }}_fat)      | linux/arm64 | yes      | debian {{ DEBIAN_VERSION_MASTER }}      | for raspberry pi 64-Bit os
 **alpine** (or {{ MAGICMIRROR_VERSION }}_alpine | all 3 archs | no       | alpine                                  | only `serveronly`-mode, smaller in size
 
@@ -29,10 +29,10 @@ Version {{ MAGICMIRROR_VERSION }} is the current release of MagicMirror. Older v
 TAG                | OS/ARCH                     | ELECTRON | DISTRO                                   | DESCRIPTION
 ------------------ | --------------------------- | -------- | -----------------------------------------|------------------------------------------
 **develop**        | linux/amd64                 | no       | debian {{ DEBIAN_VERSION_DEVELOP }} slim | for x86, only `serveronly`-mode
-**develop**        | linux/arm                   | yes      | debian {{ DEBIAN_VERSION_DEVELOP }} slim | for raspberry pi 32-Bit os
+**develop**        | linux/arm                   | yes      | debian bookworm slim                     | for raspberry pi 32-Bit os
 **develop**        | linux/arm64                 | yes      | debian {{ DEBIAN_VERSION_DEVELOP }} slim | for raspberry pi 64-Bit os
 **develop_fat**    | linux/amd64                 | yes      | debian {{ DEBIAN_VERSION_DEVELOP }}      | for x86
-**develop_fat**    | linux/arm                   | yes      | debian {{ DEBIAN_VERSION_DEVELOP }} slim | for raspberry pi 32-Bit os
+**develop_fat**    | linux/arm                   | yes      | debian bookworm                          | for raspberry pi 32-Bit os
 **develop_fat**    | linux/arm64                 | yes      | debian {{ DEBIAN_VERSION_DEVELOP }}      | for raspberry pi 64-Bit os
 **develop_alpine** | all 3 archs                 | no       | alpine                                   | only `serveronly`-mode, smaller in size
 
