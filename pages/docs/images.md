@@ -36,4 +36,4 @@ TAG                | OS/ARCH                     | ELECTRON | DISTRO            
 **develop_fat**    | linux/arm64                 | yes      | debian {{ DEBIAN_VERSION_DEVELOP }}      | for raspberry pi 64-Bit os
 **develop_alpine** | all 3 archs                 | no       | alpine                                   | only `serveronly`-mode, smaller in size
 
-These images are using the `develop` branch of the MagicMirror² git repository and Node version {{ NODE_VERSION_DEVELOP }} (except `linux/arm` which uses Node version 22 because Node version {{ NODE_VERSION_DEVELOP }} is not available for this architecture).
+These images are using the `develop` branch of the MagicMirror² git repository and Node version {{ NODE_VERSION_DEVELOP }} (except `linux/arm` which has to stay on debian bookworm with Node version 22 because newer node images are not available for this architecture).

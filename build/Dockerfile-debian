@@ -2,7 +2,7 @@ ARG CI_REGISTRY_IMAGE BUILDER_TAG FAT NODE_VERSION DEBIAN_VERSION SLIM
 FROM ${CI_REGISTRY_IMAGE}:${BUILDER_TAG}_${TARGETARCH}${FAT}_artifacts AS builder
 FROM node:${NODE_VERSION}-${DEBIAN_VERSION}${SLIM} AS build-amd64
 FROM node:${NODE_VERSION}-${DEBIAN_VERSION}${SLIM} AS build-arm64
-FROM node:22-${DEBIAN_VERSION}${SLIM} AS build-arm
+FROM node:22-bookworm${SLIM} AS build-arm
 FROM build-${TARGETARCH}
 LABEL maintainer="Karsten Hassel"
 
@@ -32,20 +32,25 @@ else
      procps arp-scan"
   if [[ "${TARGETARCH}" != "amd64" ]]; then
     # install pi stuff
-    _pck="${_pck} libraspberrypi-bin libllvm14 libgl1-mesa-dri libglapi-mesa libsensors5 libdrm-radeon1 libelf1 libdrm-amdgpu1 \
-      libdrm-nouveau2 x11-xserver-utils libgpiod-dev gpiod wlr-randr cec-utils libegl-mesa0 libegl1 libegl1-mesa libgl1 libgles2 \
-      libgles2-mesa libglvnd0 libglx-mesa0 libglx0 libxcb-glx0 mesa-utils mesa-utils-bin libwayland-egl1-mesa"
-    wget https://archive.raspbian.org/raspbian.public.key -O - | apt-key add -
-    echo 'deb http://raspbian.raspberrypi.org/raspbian/ '${DEBIAN_VERSION}' main contrib non-free rpi' | tee -a /etc/apt/sources.list
-    wget -O - http://archive.raspberrypi.org/debian/raspberrypi.gpg.key | apt-key add -
-    echo 'deb http://archive.raspberrypi.org/debian/ '${DEBIAN_VERSION}' main ui' | tee -a /etc/apt/sources.list.d/raspi.list
-    apt-get update
+    _pck="${_pck} libgl1-mesa-dri libglapi-mesa libsensors5 libdrm-radeon1 libelf1 libdrm-amdgpu1 \
+      libdrm-nouveau2 x11-xserver-utils libgpiod-dev gpiod wlr-randr cec-utils libegl-mesa0 libegl1 libgl1 libgles2 \
+      libglvnd0 libglx-mesa0 libglx0 libxcb-glx0 mesa-utils mesa-utils-bin"
+    if [[ "${DEBIAN_VERSION}" == "bookworm" ]]; then
+      _pck="${_pck} libraspberrypi-bin libllvm14 libegl1-mesa libgles2-mesa libwayland-egl1-mesa"
+      wget https://archive.raspbian.org/raspbian.public.key -O - | gpg --dearmor -o /usr/share/keyrings/archive-raspian-keyring.gpg
+      echo 'deb [signed-by=/usr/share/keyrings/archive-raspian-keyring.gpg] http://raspbian.raspberrypi.org/raspbian/ bookworm main contrib non-free rpi' | tee -a /etc/apt/sources.list
+      wget -O - http://archive.raspberrypi.org/debian/raspberrypi.gpg.key | gpg --dearmor -o /usr/share/keyrings/archive-raspberrypi-keyring.gpg
+      echo 'deb [signed-by=/usr/share/keyrings/archive-raspberrypi-keyring.gpg] http://archive.raspberrypi.org/debian/ bookworm main ui' | tee -a /etc/apt/sources.list.d/raspi.list
+      apt-get update
+      chmod u+rwx,g+rwx,o+rwx /etc
+      chmod u+rw,g+rw,o+rw /etc/localtime /etc/timezone
+    else
+      # trixie
+      _pck="${_pck} libllvm19 libegl1-mesa-dev libgles2-mesa-dev libwayland-egl1"
+    fi
   fi
 fi
 if [[ "${NODE_ENV}" == "test" ]]; then
-  wget https://archive.raspbian.org/raspbian.public.key -O - | apt-key add -
-  echo 'deb http://deb.debian.org/debian/ trixie main contrib non-free non-free-firmware' | tee -a /etc/apt/sources.list
-  apt-get update
   _pck="${_pck} labwc libfaketime"
 fi
 DEBIAN_FRONTEND=noninteractive apt-get -qy --no-install-recommends install ${_pck}
@@ -62,8 +67,6 @@ rm -rf /var/lib/apt/lists/*
 echo "#!/bin/bash" > /usr/local/bin/sudo
 echo 'exec "$@"' >> /usr/local/bin/sudo
 chmod +x *.sh /usr/local/bin/sudo
-chmod u+rwx,g+rwx,o+rwx /etc
-chmod u+rw,g+rw,o+rw /etc/localtime /etc/timezone
 git config --system --add safe.directory $MM_DIR
 git config core.fileMode false
 groupadd --gid 105 render

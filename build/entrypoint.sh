@@ -34,15 +34,17 @@ _start_mm() {
 
 if [ -z "$TZ" ]; then
   export TZ="$(wget -qO - http://geoip.ubuntu.com/lookup | sed -n -e 's/.*<TimeZone>\(.*\)<\/TimeZone>.*/\1/p')"
-  if [ -w /etc/localtime ]; then
-    ln -fs /usr/share/zoneinfo/$TZ /etc/localtime
-  else
-    _info "***WARNING*** could not write to /etc/localtime"
-  fi
-  if [ -w /etc/timezone ]; then
-    echo "$TZ" > /etc/timezone
-  else
-    _info "***WARNING*** could not write to /etc/timezone"
+  if cat /etc/os-release | grep bookworm; then
+    if [ -w /etc/localtime ]; then
+      ln -fs /usr/share/zoneinfo/$TZ /etc/localtime
+    else
+      _info "***WARNING*** could not write to /etc/localtime"
+    fi
+    if [ -w /etc/timezone ]; then
+      echo "$TZ" > /etc/timezone
+    else
+      _info "***WARNING*** could not write to /etc/timezone"
+    fi
   fi
 fi
 

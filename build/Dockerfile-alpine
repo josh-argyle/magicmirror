@@ -22,9 +22,6 @@ chown node:node $MM_DIR
 apk add --no-cache git nano tzdata tini coreutils
 echo "#!/bin/sh" > /usr/local/bin/sudo
 echo 'exec "$@"' >> /usr/local/bin/sudo
-touch /etc/localtime /etc/timezone
-chmod u+rwx,g+rwx,o+rwx /etc
-chmod u+rw,g+rw,o+rw /etc/localtime /etc/timezone
 chmod +x *.sh /usr/local/bin/sudo
 git config --system --add safe.directory $MM_DIR
 git config core.fileMode false
