@@ -42,8 +42,6 @@ else
       wget -O - http://archive.raspberrypi.org/debian/raspberrypi.gpg.key | gpg --dearmor -o /usr/share/keyrings/archive-raspberrypi-keyring.gpg
       echo 'deb [signed-by=/usr/share/keyrings/archive-raspberrypi-keyring.gpg] http://archive.raspberrypi.org/debian/ bookworm main ui' | tee -a /etc/apt/sources.list.d/raspi.list
       apt-get update
-      chmod u+rwx,g+rwx,o+rwx /etc
-      chmod u+rw,g+rw,o+rw /etc/localtime /etc/timezone
     else
       # trixie
       _pck="${_pck} libllvm19 libegl1-mesa-dev libgles2-mesa-dev libwayland-egl1"
@@ -64,6 +62,10 @@ if [[ -z "${SLIM}" ]]; then
 fi
 apt-get clean
 rm -rf /var/lib/apt/lists/*
+if [[ "${DEBIAN_VERSION}" == "bookworm" ]]; then
+  chmod u+rwx,g+rwx,o+rwx /etc
+  chmod u+rw,g+rw,o+rw /etc/localtime /etc/timezone
+fi
 echo "#!/bin/bash" > /usr/local/bin/sudo
 echo 'exec "$@"' >> /usr/local/bin/sudo
 chmod +x *.sh /usr/local/bin/sudo

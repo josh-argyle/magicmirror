@@ -6,11 +6,11 @@ config_dir="${MM_DIR}/config"
 css_dir="${MM_DIR}/css"
 
 _info() {
-  echo "[entrypoint $(date +%T.%3N)] [INFO]   $1"
+  echo "[entrypoint $(date +%T.%3N)] [INFO]  $1"
 }
 
 _error() {
-  echo "[entrypoint $(date +%T.%3N)] [ERROR]  $1"
+  echo "[entrypoint $(date +%T.%3N)] [ERROR] $1"
 }
 
 _start_mm() {
