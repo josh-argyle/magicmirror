@@ -34,12 +34,14 @@ modules' appearance. CSS basics are documented
 
 ## Default Modules
 
-The default modules of MagicMirror² are located in the folder `~/magicmirror/mounts/modules`. These modules are maintained in the MagicMirror² project and not - as other modules - in own git repositories. So if they are mounted the first time outside the container this version remains on the host and would never updated again. To prevent this, the container overrides the `default` modules folder with the versions from inside the container.
+The default modules of MagicMirror² are located in the subfolder `modules/default`. These modules are maintained in the MagicMirror² project and not - as other modules - in own git repositories. Because the folder `modules` is mounted on the host this setup creates a symlink for the `default` folder which points to a location inside the container (containing the `default` stuff of the repository).
 
-If someone does not agree with this procedure he can avoid the copy process by setting the environment variable `MM_OVERRIDE_DEFAULT_MODULES` to `false` in the `.env` file:
+If someone does not agree with this procedure he can avoid the symlinking process by setting the environment variable `MM_OVERRIDE_DEFAULT_MODULES` to `false` in the `.env` file:
 ```bash
 MM_OVERRIDE_DEFAULT_MODULES="false"
 ```
+
+If you choose `MM_OVERRIDE_DEFAULT_MODULES="false"` you must provide your own version of the `default` folder as subfolder under `~/magicmirror/mounts/modules` on the host.
 
 ## Timezone
 

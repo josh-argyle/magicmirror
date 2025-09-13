@@ -41,7 +41,7 @@ test_alpine:
     - |
       set -e
       cd /opt/magic_mirror
-      git log -1 > /tmp/image.txt
+      git rev-parse HEAD~1 > /tmp/image.txt
       if [ "${CI_COMMIT_BRANCH}" = "master" ]; then
         echo "CI_COMMIT_BRANCH is master"
         BuildRef="${MAGICMIRROR_VERSION}"
@@ -52,7 +52,7 @@ test_alpine:
       cd /tmp
       git clone --depth 1 -b "${BuildRef}" --single-branch "${GITREPO_URL}" mm
       cd mm
-      git log -1 > /tmp/clone.txt
+      git rev-parse HEAD > /tmp/clone.txt
       cat /tmp/image.txt
       echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
       cat /tmp/clone.txt

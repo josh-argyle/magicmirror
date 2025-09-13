@@ -52,19 +52,19 @@ if [ -z "$TZ" ]; then
   _info "***WARNING*** could not set timezone, please set TZ variable in compose.yaml, see https://khassel.gitlab.io/magicmirror/configuration/#timezone"
 fi
 
-if [ ! -d "${default_dir}" ]; then
-  MM_OVERRIDE_DEFAULT_MODULES=true
-  mkdir -p ${default_dir}
-fi
-
 if [ "${MM_OVERRIDE_DEFAULT_MODULES}" = "true" ]; then
-  if [ -w "${default_dir}" ]; then
-    _info "copy default modules"
-    rm -rf ${default_dir}
-    mkdir -p ${default_dir}
-    cp -r ${MM_DIR}/mount_ori/modules/default/. ${default_dir}/
+  mkdir -p ${modules_dir}
+  if [ -w "${modules_dir}" ]; then
+    if test -d "${default_dir}" && ! test -L "${default_dir}"; then
+      # if it's a real directory (not a symlink) then move it away
+      _info "renaming default modules to default-save"
+      rm -rf "${modules_dir}/default-save"
+      mv "${default_dir}" "${modules_dir}/default-save"
+    fi
+    _info "symlink default modules"
+    ln -sf ${MM_DIR}/__modules/default ${MM_DIR}/modules
   else
-    _error "No write permission for ${default_dir}, skipping copying default modules"
+    _error "No write permission for ${modules_dir}, skipping symlinking default modules"
   fi
 fi
 
@@ -73,7 +73,7 @@ fi
 if [ "${MM_OVERRIDE_CSS}" = "true" ]; then
   if [ -w "${css_dir}" ]; then
     _info "copy css files"
-    cp ${MM_DIR}/mount_ori/css/* ${css_dir}/
+    cp ${MM_DIR}/__css/* ${css_dir}/
   else
     _error "No write permission for ${css_dir}, skipping copying css files"
   fi
@@ -86,7 +86,7 @@ if [ ! -f "${config_dir}/config.js" ]; then
   mkdir -p ${config_dir}
   if [ -w "${config_dir}" ]; then
     _info "copy default config.js"
-    cp ${MM_DIR}/mount_ori/config/config.js.sample ${config_dir}/config.js
+    cp ${MM_DIR}/__config/config.js.sample ${config_dir}/config.js
   else
     _error "No write permission for ${config_dir}, skipping copying config.js"
   fi
@@ -112,8 +112,7 @@ if [ "$STARTENV" = "test" ]; then
   export WAYLAND_DISPLAY=wayland-0
 
   cd ${MM_DIR}
-
-  rm -rf mount_ori/
+  
   node --run test:prettier
   node --run test:js
   node --run test:css
