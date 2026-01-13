@@ -1,0 +1,26 @@
+.habit-tracker {
+    text-align: center;
+    color: #fff;
+}
+
+.habit-section {
+    margin-bottom: 20px;
+}
+
+.habit-title {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.habit-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px 10px;
+    margin: 0;
+}
+
+.habit-item {
+    font-size: 1.1em;
+    text-align: center;
+}

@@ -1,0 +1,32 @@
+.nutrition-tracker {
+    text-align: center;
+    color: #fff;
+}
+
+.nutrition-title {
+    font-size: 1.2em;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.nutrition-data {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+}
+
+.nutrition-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.nutrition-label {
+    font-size: 1.2em;
+    margin-bottom: 5px;
+}
+
+.nutrition-value {
+    font-weight: bold;
+    font-size: 1.5em;
+}
