@@ -1,1 +1,159 @@
-/* override css here */
+/* Restart docker to see changes */
+body {
+    margin: 40px 40px;
+    color: #fff !important;
+    width: calc(100% - 80px);
+    max-width: calc(100% - 80px);
+}
+.region.top.bar,
+.region.top.left,
+.region.top.center,
+.region.top.right,
+.region.upper.third,
+.region.middle.center,
+.region.lower.third,
+.region.bottom.bar,
+.region.bottom.left,
+.region.bottom.center,
+.region.bottom.right {
+    transform: unset !important;
+    width: calc(100% - 80px) !important;
+    max-width: calc(100% - 80px) !important;
+}
+
+.module-header {
+    color: #fff !important;
+    font-size: 1.5em !important;
+    padding-bottom: 12px;
+}
+
+.dimmed {
+    color: #ccc !important;
+    opacity: 1 !important;
+}
+
+.light {
+    color: #eee !important;
+}
+
+.normal {
+    color: #fff !important;
+}
+
+/* POSITION ALL REGIONS FROM TOP */
+.region {
+    position: absolute !important;
+    left: 40px !important;
+    right: 40px !important;
+    text-align: center !important;
+}
+
+.region.top.center {
+    top: 100px;
+}
+
+.region.upper.third {
+    top: 320px;
+}
+
+.region.middle.center {
+    top: 580px;
+    text-align: left !important;
+}
+
+.region.lower.third {
+    bottom: 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+}
+
+/* CLOCK STYLING */
+.module.clock {
+    transform: scale(1.8) !important;
+    color: #fff !important;
+}
+
+.module.clock .dimmed {
+    color: #ddd !important;
+}
+
+/* WEATHER STYLING */
+.module.weather {
+    scale: 1.6;
+    color: #fff !important;
+    display: inline-block;
+    max-width: 32%;
+text-align: start;
+}
+
+.module.weather .dimmed {
+    color: #ddd !important;
+}
+
+.module.weather .module-header,
+.module.weather .bright.small {
+    display: none !important;
+}
+
+/* CALENDAR STYLING */
+.module.calendar {
+    transform: scale(1.2);
+    transform-origin: top left;
+    color: #fff !important;
+    max-width: calc(100% - 80px) !important;
+}
+
+.module.calendar .dimmed {
+    color: #ddd !important;
+}
+
+.module.calendar td {
+    word-wrap: break-word;
+    text-align: left;
+    white-space: normal !important;
+}
+
+.module.calendar .title {
+    white-space: normal !important;
+    overflow: visible !important;
+}
+
+.module.calendar .location {
+    overflow: visible !important;
+    padding-bottom: 8px;
+}
+
+.module.calendar .event-wrapper.event:not(:first-of-type) {
+    padding-top: 8px !important;
+}
+
+.module.calendar .today {
+    font-weight: bold !important;
+    font-size: 1.2em !important;
+}
+
+/* LOWER THIRD MODULES */
+.region.lower.third .module {
+    margin-bottom: 20px;
+}
+
+.region.upper.third .container {
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+#module_6_MMM-HabitTracker,
+#module_7_MMM-NutritionTracker {
+    width: 100%;
+}
+
+.region.lower.third {
+    gap: 32px;
+    top: unset;
+}
+
+.region.lower.third .container {
+    justify-content: center;
+    align-items: center;
+}
