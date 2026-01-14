@@ -290,7 +290,7 @@ body {
     display: flex !important;
     justify-content: center;
     align-items: center;
-    width: auto !important;
+    width: 400px !important;
     margin: 0 auto 20px auto;
     padding: 12px 32px;
     background: rgba(239, 68, 68, 0.3);
