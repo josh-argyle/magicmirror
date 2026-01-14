@@ -45,15 +45,15 @@ Module.register("MMM-ContegoDashboard", {
         const columnsContainer = document.createElement("div");
         columnsContainer.className = "contego-columns";
 
-        // Todos Section
-        if (this.config.showTodos && data.todos?.length > 0) {
-            const todosSection = this.createTodosSection(data.todos);
+        // Todos Section - always show structure
+        if (this.config.showTodos) {
+            const todosSection = this.createTodosSection(data.todos || []);
             columnsContainer.appendChild(todosSection);
         }
 
-        // Notifications Section
-        if (this.config.showNotifications && data.notifications?.length > 0) {
-            const notificationsSection = this.createNotificationsSection(data.notifications);
+        // Notifications Section - always show structure
+        if (this.config.showNotifications) {
+            const notificationsSection = this.createNotificationsSection(data.notifications || []);
             columnsContainer.appendChild(notificationsSection);
         }
 
@@ -118,25 +118,32 @@ Module.register("MMM-ContegoDashboard", {
         const list = document.createElement("div");
         list.className = "contego-list";
 
-        const displayTodos = todos.slice(0, this.config.maxTodos);
-        displayTodos.forEach(todo => {
-            const item = document.createElement("div");
-            item.className = "contego-item";
+        if (todos.length === 0) {
+            const emptyItem = document.createElement("div");
+            emptyItem.className = "contego-item contego-empty";
+            emptyItem.innerHTML = '<span class="item-title light dimmed">No todos</span>';
+            list.appendChild(emptyItem);
+        } else {
+            const displayTodos = todos.slice(0, this.config.maxTodos);
+            displayTodos.forEach(todo => {
+                const item = document.createElement("div");
+                item.className = "contego-item";
 
-            const todoTitle = document.createElement("div");
-            todoTitle.className = "item-title light";
-            todoTitle.innerHTML = this.truncateText(todo.title, 50);
-            item.appendChild(todoTitle);
+                const todoTitle = document.createElement("div");
+                todoTitle.className = "item-title light";
+                todoTitle.innerHTML = this.truncateText(todo.title, 50);
+                item.appendChild(todoTitle);
 
-            if (todo.dueDate) {
-                const dueDate = document.createElement("div");
-                dueDate.className = "item-meta dimmed xsmall";
-                dueDate.innerHTML = "Due: " + this.formatDate(todo.dueDate);
-                item.appendChild(dueDate);
-            }
+                if (todo.dueDate) {
+                    const dueDate = document.createElement("div");
+                    dueDate.className = "item-meta dimmed xsmall";
+                    dueDate.innerHTML = "Due: " + this.formatDate(todo.dueDate);
+                    item.appendChild(dueDate);
+                }
 
-            list.appendChild(item);
-        });
+                list.appendChild(item);
+            });
+        }
 
         section.appendChild(list);
         return section;
@@ -154,26 +161,33 @@ Module.register("MMM-ContegoDashboard", {
         const list = document.createElement("div");
         list.className = "contego-list";
 
-        const displayNotifications = notifications.slice(0, this.config.maxNotifications);
-        displayNotifications.forEach(notification => {
-            const item = document.createElement("div");
-            item.className = "contego-item";
+        if (notifications.length === 0) {
+            const emptyItem = document.createElement("div");
+            emptyItem.className = "contego-item contego-empty";
+            emptyItem.innerHTML = '<span class="item-title light dimmed">No notifications</span>';
+            list.appendChild(emptyItem);
+        } else {
+            const displayNotifications = notifications.slice(0, this.config.maxNotifications);
+            displayNotifications.forEach(notification => {
+                const item = document.createElement("div");
+                item.className = "contego-item";
 
-            // Add entity type indicator
-            const typeClass = this.getEntityTypeClass(notification.entityType);
+                // Add entity type indicator
+                const typeClass = this.getEntityTypeClass(notification.entityType);
 
-            const notifTitle = document.createElement("div");
-            notifTitle.className = `item-title light ${typeClass}`;
-            notifTitle.innerHTML = this.truncateText(notification.title, 45);
-            item.appendChild(notifTitle);
+                const notifTitle = document.createElement("div");
+                notifTitle.className = `item-title light ${typeClass}`;
+                notifTitle.innerHTML = this.truncateText(notification.title, 45);
+                item.appendChild(notifTitle);
 
-            const meta = document.createElement("div");
-            meta.className = "item-meta dimmed xsmall";
-            meta.innerHTML = this.formatDate(notification.createdAt);
-            item.appendChild(meta);
+                const meta = document.createElement("div");
+                meta.className = "item-meta dimmed xsmall";
+                meta.innerHTML = this.formatDate(notification.createdAt);
+                item.appendChild(meta);
 
-            list.appendChild(item);
-        });
+                list.appendChild(item);
+            });
+        }
 
         section.appendChild(list);
         return section;
