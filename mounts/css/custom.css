@@ -19,7 +19,7 @@ html, body {
 body {
     display: flex;
     flex-direction: column;
-    padding: 60px;
+    padding: 84px;
     gap: 20px;
 }
 
