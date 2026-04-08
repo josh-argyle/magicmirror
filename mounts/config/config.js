@@ -70,6 +70,7 @@ let config = {
 				showLocation: true,
 				maximumEntries: 6,
 				maximumNumberOfDays: 90,
+				broadcastPastEvents: true,
 				fetchInterval: 5 * 60 * 1000,
 				dateFormat: "MMM Do HH:mm",
 				hideDuplicates: true,
