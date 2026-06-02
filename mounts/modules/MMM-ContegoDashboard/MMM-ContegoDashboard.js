@@ -131,7 +131,7 @@ Module.register("MMM-ContegoDashboard", {
 
                 const todoTitle = document.createElement("div");
                 todoTitle.className = "item-title light";
-                todoTitle.innerHTML = this.truncateText(todo.title, 50);
+                todoTitle.textContent = this.truncateText(todo.message || todo.title, 50);
                 item.appendChild(todoTitle);
 
                 if (todo.dueDate) {

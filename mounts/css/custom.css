@@ -1,4 +1,4 @@
-/* MagicMirror CSS Reset - Clean 4-Row Layout */
+/* MagicMirror CSS - Portrait 1078x1192 Layout */
 
 /* ===== FULL RESET ===== */
 *, *::before, *::after {
@@ -15,12 +15,11 @@ html, body {
     color: #fff;
 }
 
-/* Body becomes flex column */
 body {
     display: flex;
     flex-direction: column;
-    padding: 92px;
-    gap: 20px;
+    padding: 16px 50px 30px;
+    gap: 28px;
 }
 
 /* Hide all module headers */
@@ -34,6 +33,7 @@ body {
 .region.bottom.bar,
 .region.top.left,
 .region.top.right,
+.region.top.center,
 .region.bottom.left,
 .region.bottom.center,
 .region.bottom.right {
@@ -53,47 +53,24 @@ body {
     flex-shrink: 0;
 }
 
-/* ===== ROW 1: TOP BAR (contains clock) ===== */
-.region.top.bar {
-    flex: 0 0 auto;
-    display: block;
-}
-
-.region.top.bar > .container {
-    display: none; /* Hide updatenotification */
-}
-
-.region.top.center {
-    text-align: center;
-}
-
-.region.top.center .container {
-    display: block;
-}
-
-/* ===== ROW 2: WEATHER ===== */
+/* ===== ROW 1: CLOCK + CURRENT WEATHER + FORECAST ===== */
 .region.upper.third {
     flex: 0 0 auto;
-    width: 100% !important;
 }
 
 .region.upper.third > .container {
     display: flex !important;
     flex-direction: row;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 40px;
     width: 100% !important;
 }
 
-.region.upper.third .module.weather {
-    flex: 1 1 50%;
-}
-
-/* ===== ROW 3: CALENDAR (grows to fill, pushes bottom to ~75%) ===== */
+/* ===== ROW 2: CALENDAR ===== */
 .region.middle.center {
     display: block !important;
-    flex: 1 1 auto;
-    min-height: calc(75vh - 450px); /* Push bottom section to ~3/4 down */
+    flex: 0 0 auto;
     overflow: visible;
 }
 
@@ -101,9 +78,10 @@ body {
     display: block !important;
 }
 
-/* ===== ROW 4: TODOS/NOTIFICATIONS ===== */
+/* ===== ROW 3: TODOS/NOTIFICATIONS (anchored to bottom) ===== */
 .region.lower.third {
     flex: 0 0 auto;
+    margin-top: auto;
 }
 
 .region.lower.third > .container {
@@ -111,7 +89,7 @@ body {
 }
 
 .region.lower.third > .container > br {
-    display: none; /* Remove random br */
+    display: none;
 }
 
 /* ===== CONTAINER RESET ===== */
@@ -129,11 +107,7 @@ body {
     opacity: 1 !important;
 }
 
-.light {
-    color: #fff !important;
-}
-
-.normal, .bright {
+.light, .normal, .bright {
     color: #fff !important;
 }
 
@@ -143,17 +117,19 @@ body {
 
 /* ===== CLOCK STYLING ===== */
 .module.clock {
-    font-size: 1em;
+    flex: 1 1 0;
+    text-align: center;
 }
 
 .module.clock .time {
-    font-size: 6em;
+    font-size: 4.5em;
     font-weight: 300;
+    line-height: 1;
 }
 
 .module.clock .date {
-    font-size: 1.8em;
-    margin-bottom: 8px;
+    font-size: 1.3em;
+    margin-bottom: 2px;
 }
 
 .module.clock .clock-second-digital {
@@ -163,8 +139,7 @@ body {
 
 /* ===== WEATHER STYLING ===== */
 .module.weather {
-    flex: 1;
-    font-size: 1.5em;
+    flex: 1 1 0;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -173,19 +148,19 @@ body {
 }
 
 .module.weather .large {
-    font-size: 3.6em;
+    font-size: 3em;
 }
 
 .module.weather .normal.medium,
 .module.weather .feelslike {
-    font-size: 1.5em;
+    font-size: 1.15em;
 }
 
 .module.weather .flex {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .module.weather .type-temp {
@@ -197,14 +172,9 @@ body {
 }
 
 .module.weather table td {
-    padding: 2px 12px 2px 0;
+    padding: 4px 12px 4px 0;
     text-align: left;
-}
-
-/* Weather forecast module specifically */
-#module_4_weather table td {
-    padding: 6px 24px 6px 0;
-    font-size: 1.4em;
+    font-size: 1.15em;
 }
 
 /* ===== CALENDAR STYLING ===== */
@@ -218,16 +188,17 @@ body {
 }
 
 .module.calendar tr.event-wrapper td {
-    padding: 6px 0 0 0;
-    vertical-align: top;
+    padding: 5px 0 0 0;
+    vertical-align: middle;
     text-align: left;
-    font-size: 1.4em;
+    font-size: 1.15em;
 }
 
 .module.calendar tr.event-wrapper-location td {
-    padding: 0 0 6px 0;
+    padding: 0 0 4px 0;
     text-align: left;
-    font-size: 1.4em;
+    font-size: 0.95em;
+    opacity: 0.55;
 }
 
 .module.calendar .title {
@@ -241,18 +212,17 @@ body {
 }
 
 .module.calendar .location {
-    font-size: 0.85em;
-    opacity: 0.7;
+    font-size: 1em;
     text-align: left !important;
 }
 
 .module.calendar .symbol {
-    width: 20px;
-    padding-right: 0 !important;
+    width: 24px;
+    padding-right: 4px !important;
     vertical-align: middle;
+    line-height: 1;
 }
 
-/* Replace Font Awesome with Lucide-style icons */
 .module.calendar .symbol span {
     display: none;
 }
@@ -270,7 +240,7 @@ body {
 /* ===== CONTEGO DASHBOARD STYLING ===== */
 .module.MMM-ContegoDashboard {
     width: 100%;
-    font-size: 1.21em;
+    font-size: 1.1em;
 }
 
 .contego-counts-bar {
@@ -281,7 +251,7 @@ body {
     width: 100%;
 }
 
-/* Error Logs Alert - centered, bold red */
+/* Error Logs Alert */
 .contego-error-logs {
     display: none;
 }
@@ -291,48 +261,26 @@ body {
     justify-content: center;
     align-items: center;
     width: 400px !important;
-    margin: 0 auto 20px auto;
-    padding: 12px 32px;
+    margin: 0 auto 16px auto;
+    padding: 10px 24px;
     background: rgba(239, 68, 68, 0.3);
     border: 2px solid #ef4444;
     border-radius: 8px;
     color: #ff6b6b;
-    font-size: 1.5em;
+    font-size: 1.3em;
     font-weight: bold;
 }
 
 .contego-error-logs .error-icon {
-    margin-right: 12px;
+    margin-right: 10px;
     font-size: 1.2em;
-}
-
-.contego-counts-bar {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 20px;
-    font-size: 1.1em;
-}
-
-.contego-counts-bar .count-item {
-    padding: 6px 16px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.contego-counts-bar .count-item.todos {
-    color: #fbbf24;
-}
-
-.contego-counts-bar .count-item.notifications {
-    color: #60a5fa;
 }
 
 .contego-columns {
     display: flex !important;
     flex-direction: row !important;
     justify-content: space-between;
-    gap: 80px;
+    gap: 60px;
     width: 100%;
 }
 
@@ -343,22 +291,22 @@ body {
 .contego-section-title {
     font-size: 1.1em;
     font-weight: bold;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .contego-item {
-    padding: 8px 0;
+    padding: 6px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .contego-item .item-title {
-    font-size: 1.1em;
+    font-size: 1.05em;
 }
 
 .contego-item .item-meta {
-    font-size: 0.9em;
+    font-size: 0.85em;
 }
 
 .contego-item:last-child {

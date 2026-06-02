@@ -22,7 +22,7 @@ let config = {
 		},
 		{
 			module: "clock",
-			position: "top_center"
+			position: "upper_third"
 		},
 		{
 			module: "weather",
