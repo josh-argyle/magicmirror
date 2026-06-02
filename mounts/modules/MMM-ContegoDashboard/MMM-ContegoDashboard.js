@@ -41,25 +41,9 @@ Module.register("MMM-ContegoDashboard", {
         const countsBar = this.createCountsBar(data.counts, errorData);
         if (countsBar) wrapper.appendChild(countsBar);
 
-        // Create a flex container for todos and notifications side by side
-        const columnsContainer = document.createElement("div");
-        columnsContainer.className = "contego-columns";
-
-        // Todos Section - always show structure
-        if (this.config.showTodos) {
-            const todosSection = this.createTodosSection(data.todos || []);
-            columnsContainer.appendChild(todosSection);
-        }
-
-        // Notifications Section - always show structure
-        if (this.config.showNotifications) {
-            const notificationsSection = this.createNotificationsSection(data.notifications || []);
-            columnsContainer.appendChild(notificationsSection);
-        }
-
-        if (columnsContainer.children.length > 0) {
-            wrapper.appendChild(columnsContainer);
-        }
+        // Combined list of todos and notifications
+        const combinedSection = this.createCombinedSection(data.todos || [], data.notifications || []);
+        wrapper.appendChild(combinedSection);
 
         // If nothing to show
         if (wrapper.children.length === 0) {
@@ -106,84 +90,60 @@ Module.register("MMM-ContegoDashboard", {
         return bar;
     },
 
-    createTodosSection: function(todos) {
+    createCombinedSection: function(todos, notifications) {
         const section = document.createElement("div");
-        section.className = "contego-section contego-todos";
-
-        const title = document.createElement("div");
-        title.className = "contego-section-title bright";
-        title.innerHTML = "Todos";
-        section.appendChild(title);
+        section.className = "contego-section contego-combined";
 
         const list = document.createElement("div");
         list.className = "contego-list";
 
-        if (todos.length === 0) {
+        const items = [];
+        todos.forEach(todo => {
+            items.push({
+                type: "todo",
+                text: todo.message || todo.title,
+                date: todo.dueDate || todo.createdAt
+            });
+        });
+        notifications.forEach(n => {
+            items.push({
+                type: "notification",
+                text: n.title,
+                date: n.createdAt
+            });
+        });
+
+        items.sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+
+        if (items.length === 0) {
             const emptyItem = document.createElement("div");
             emptyItem.className = "contego-item contego-empty";
-            emptyItem.innerHTML = '<span class="item-title light dimmed">No todos</span>';
+            emptyItem.textContent = "No items";
             list.appendChild(emptyItem);
         } else {
-            const displayTodos = todos.slice(0, this.config.maxTodos);
-            displayTodos.forEach(todo => {
+            const maxDisplay = this.config.maxTodos;
+            const hasMore = maxDisplay && items.length > maxDisplay;
+            const displayItems = maxDisplay ? items.slice(0, maxDisplay) : items;
+            const fadeCount = 2;
+
+            displayItems.forEach((entry, i) => {
                 const item = document.createElement("div");
                 item.className = "contego-item";
-
-                const todoTitle = document.createElement("div");
-                todoTitle.className = "item-title light";
-                todoTitle.textContent = this.truncateText(todo.message || todo.title, 50);
-                item.appendChild(todoTitle);
-
-                if (todo.dueDate) {
-                    const dueDate = document.createElement("div");
-                    dueDate.className = "item-meta dimmed xsmall";
-                    dueDate.innerHTML = "Due: " + this.formatDate(todo.dueDate);
-                    item.appendChild(dueDate);
+                if (entry.type === "notification") {
+                    item.classList.add("contego-notification");
                 }
 
-                list.appendChild(item);
-            });
-        }
+                if (hasMore) {
+                    const fromEnd = displayItems.length - 1 - i;
+                    if (fromEnd < fadeCount) {
+                        item.style.opacity = 0.3 + (fromEnd * 0.3);
+                    }
+                }
 
-        section.appendChild(list);
-        return section;
-    },
-
-    createNotificationsSection: function(notifications) {
-        const section = document.createElement("div");
-        section.className = "contego-section contego-notifications";
-
-        const title = document.createElement("div");
-        title.className = "contego-section-title bright";
-        title.innerHTML = "Notifications";
-        section.appendChild(title);
-
-        const list = document.createElement("div");
-        list.className = "contego-list";
-
-        if (notifications.length === 0) {
-            const emptyItem = document.createElement("div");
-            emptyItem.className = "contego-item contego-empty";
-            emptyItem.innerHTML = '<span class="item-title light dimmed">No notifications</span>';
-            list.appendChild(emptyItem);
-        } else {
-            const displayNotifications = notifications.slice(0, this.config.maxNotifications);
-            displayNotifications.forEach(notification => {
-                const item = document.createElement("div");
-                item.className = "contego-item";
-
-                // Add entity type indicator
-                const typeClass = this.getEntityTypeClass(notification.entityType);
-
-                const notifTitle = document.createElement("div");
-                notifTitle.className = `item-title light ${typeClass}`;
-                notifTitle.innerHTML = this.truncateText(notification.title, 45);
-                item.appendChild(notifTitle);
-
-                const meta = document.createElement("div");
-                meta.className = "item-meta dimmed xsmall";
-                meta.innerHTML = this.formatDate(notification.createdAt);
-                item.appendChild(meta);
+                const title = document.createElement("div");
+                title.className = "item-title";
+                title.textContent = entry.text || '';
+                item.appendChild(title);
 
                 list.appendChild(item);
             });
