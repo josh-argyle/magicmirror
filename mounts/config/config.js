@@ -90,8 +90,8 @@ let config = {
 				errorLogsApiUrl: "https://contego.work/pub/error-logs/new-count",
 				apiKey: "admin:mm-17def9af-d595-4378-9dc6-3d023f123e93",
 				updateInterval: 2 * 60 * 1000,
-				maxTodos: 4,
-				maxNotifications: 5,
+				maxTodos: 0,
+				maxNotifications: 0,
 				showErrorLogs: true,
 				showTodos: true,
 				showNotifications: true
